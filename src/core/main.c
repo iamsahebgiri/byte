@@ -63,49 +63,27 @@ static char* readFile(const char* path) {
   return buffer;
 }
 
-// static void runFile(const char* path) {
-//   char* source = readFile(path);
-//   InterpretResult result = interpret(source);
-//   free(source);  // [owner]
+static void runFile(const char* path) {
+  char* source = readFile(path);
+  InterpretResult result = interpret(source);
+  free(source);  // [owner]
 
-//   if (result == INTERPRET_COMPILE_ERROR)
-//     exit(65);
-//   if (result == INTERPRET_RUNTIME_ERROR)
-//     exit(70);
-// }
+  if (result == INTERPRET_COMPILE_ERROR)
+    exit(65);
+  if (result == INTERPRET_RUNTIME_ERROR)
+    exit(70);
+}
 
 int main(int argc, const char* argv[]) {
   initVM();
-  Chunk chunk;
-  initChunk(&chunk);
-  int constant = addConstant(&chunk, 1.2);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  constant = addConstant(&chunk, 3.4);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  writeChunk(&chunk, OP_ADD, 123);
-
-  constant = addConstant(&chunk, 5.6);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  writeChunk(&chunk, OP_DIVIDE, 123);
-  writeChunk(&chunk, OP_NEGATE, 123);
-
-  writeChunk(&chunk, OP_RETURN, 123);
-  interpret(&chunk);
+  if (argc == 1) {
+    repl();
+  } else if (argc == 2) {
+    runFile(argv[1]);
+  } else {
+    fprintf(stderr, "Usage: byte <path>\n");
+    exit(64);
+  }
   freeVM();
-
-  //   if (argc == 1) {
-  //     repl();
-  //   } else if (argc == 2) {
-  //     runFile(argv[1]);
-  //   } else {
-  //     fprintf(stderr, "Usage: byte <path>\n");
-  //     exit(64);
-  //   }
   return 0;
 }
