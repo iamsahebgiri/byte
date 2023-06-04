@@ -12,6 +12,7 @@
 #define _GNU_SOURCE 1
 #endif
 
+#define DEBUG_PRINT_CODE
 #define DEBUG_TRACE_EXECUTION
 
 #define BYTE_COPYRIGHT "Copyright (c) 2023 Saheb Giri"

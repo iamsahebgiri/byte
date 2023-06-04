@@ -2,6 +2,13 @@
     "files.associations": {
         "stdio.h": "c",
         "common.h": "c",
-        "scanner.h": "c"
+        "scanner.h": "c",
+        "limits": "c",
+        "*.tcc": "c",
+        "type_traits": "c",
+        "vm.h": "c",
+        "compiler.h": "c",
+        "chunk.h": "c",
+        "stddef.h": "c"
     }
 }
