@@ -1,15 +1,17 @@
-#include "chunk.h"
 #include "common.h"
-#include "debug.h"
-#include "scanner.h"
 #include "vm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+static void usage() {
+  printf("  exit - Exit the REPL\n");
+}
+
 static void repl() {
-  printf("Byte v.0.1 \n");
+  printf("Byte Language v0.1.0\n");
+  usage();
 
   char line[1024];
   for (;;) {

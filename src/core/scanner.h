@@ -82,7 +82,7 @@ typedef enum {
   TOKEN_ELSE,    // else
   TOKEN_TRUE,    // true
   TOKEN_FALSE,   // false
-  TOKEN_FN,      // fn
+  TOKEN_FUNC,    // fn
   TOKEN_FOR,     // for
   TOKEN_PRINT,   // print
   TOKEN_RETURN,  // return
@@ -97,7 +97,7 @@ typedef enum {
 } TokenType;
 
 typedef struct {
-  const char* identifier;
+  const char *identifier;
   size_t length;
   TokenType tokenType;
 } Keyword;
@@ -110,7 +110,7 @@ static Keyword keywords[] = {
     {"import", 6, TOKEN_IMPORT}, {"class", 5, TOKEN_CLASS},
     {"if", 2, TOKEN_IF},         {"else", 4, TOKEN_ELSE},
     {"true", 4, TOKEN_TRUE},     {"false", 5, TOKEN_FALSE},
-    {"fn", 2, TOKEN_FN},         {"for", 3, TOKEN_FOR},
+    {"func", 2, TOKEN_FUNC},     {"for", 3, TOKEN_FOR},
     {"print", 5, TOKEN_PRINT},   {"return", 6, TOKEN_RETURN},
     {"super", 5, TOKEN_SUPER},   {"this", 4, TOKEN_THIS},
     {"let", 3, TOKEN_LET},       {"while", 5, TOKEN_WHILE},
@@ -119,21 +119,21 @@ static Keyword keywords[] = {
 
 typedef struct {
   TokenType type;
-  const char* start;
+  const char *start;
   int length;
   int line;
 } Token;
 
 typedef struct {
-  const char* start;
-  const char* current;
+  const char *start;
+  const char *current;
   int line;
   int interpolatingCount;
   int interpolating[MAX_INTERPOLATION_NESTING];
 } Scanner;
 
-void initScanner(Scanner* s, const char* source);
-Token scanToken(Scanner* s);
-bool isAtEnd(Scanner* s);
+void initScanner(Scanner *s, const char *source);
+Token scanToken(Scanner *s);
+bool isAtEnd(Scanner *s);
 
 #endif

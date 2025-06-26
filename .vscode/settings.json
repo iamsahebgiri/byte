@@ -10,5 +10,6 @@
         "compiler.h": "c",
         "chunk.h": "c",
         "stddef.h": "c"
-    }
+    },
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google }"
 }

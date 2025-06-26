@@ -1,0 +1,8 @@
+let fact = 1
+let n = 10
+
+for i in 1..n {
+  fact *= i
+}
+
+print(fact)

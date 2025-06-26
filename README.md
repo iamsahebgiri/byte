@@ -44,3 +44,25 @@ Outputs to given below -
 0009    | OP_RETURN
 -0.821429
 ```
+
+# In v0
+- functions and variables
+- control flow
+- arithmetic operations
+- Range
+- Loops
+- Comments
+- Printing
+- Error handling
+
+# In v1
+- Classes
+- Inheritance
+- String Interpolation
+- Support multiple numbers types
+
+# In v2
+- Modules
+- Importing
+- Exporting
+- Namespaces

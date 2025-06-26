@@ -1,0 +1,48 @@
+# this is a comment
+
+
+func main() {
+  # numbers
+  0
+  1234
+  -5678
+  3.14159
+  1.0
+  -12.34
+  0x1000000
+  0xdeadbeef
+  0x1234567890ABCDEF
+  # strings
+  "this is a string"  
+  # boolean
+  true
+  false
+
+  # ranges
+  1..10
+
+  # null
+  nil
+
+  # lists
+  [1, 2, 3]
+  ["a", "b", "c"]
+  [1, "a", true, nil]
+
+  # loops
+  for i in 1..10 {
+    print(i)
+  }
+
+  while true {
+    print("This will run forever")
+    break
+  }
+
+  # if-else
+  if true {
+    print("This is true")
+  } else {
+    print("This is false")
+  }
+}

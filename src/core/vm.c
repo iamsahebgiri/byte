@@ -1,19 +1,16 @@
+#include "vm.h"
+
 #include <stdio.h>
 
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
-#include "vm.h"
 
 VM vm;
 
-static void resetStack() {
-  vm.stackTop = vm.stack;
-}
+static void resetStack() { vm.stackTop = vm.stack; }
 
-void initVM() {
-  resetStack();
-}
+void initVM() { resetStack(); }
 
 void freeVM() {}
 
@@ -92,7 +89,6 @@ InterpretResult interpret(const char* source) {
     freeChunk(&chunk);
     return INTERPRET_COMPILE_ERROR;
   }
-
 
   vm.chunk = &chunk;
   vm.ip = vm.chunk->code;
