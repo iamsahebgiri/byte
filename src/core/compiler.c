@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "compiler.h"
+#include "object.h"
 #include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
@@ -99,7 +100,7 @@ static uint8_t makeConstant(Parser *parser, Value value) {
 static void endCompiler(Parser *parser) { emitReturn(parser); }
 
 // forward declaration
-static void expression();
+static void expression(Parser *parser);
 static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Parser *parser, Precedence precedence);
 // end forward declaration
@@ -175,6 +176,11 @@ static void emitConstant(Parser *parser, Value value) {
 static void number(Parser *parser) {
   double value = strtod(parser->previous.start, NULL);
   emitConstant(parser, NUMBER_VAL(value));
+}
+
+static void string(Parser *parser) {
+emitConstant(parser, OBJ_VAL(copyString(parser->previous.start + 1,
+                                          parser->previous.length - 2)));
 }
 
 static void unary(Parser *parser) {
@@ -262,7 +268,7 @@ ParseRule rules[] = {
     [TOKEN_CARET_EQUAL] = {NULL, NULL, PREC_NONE}, // ^=
 
     [TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},    // identifier
-    [TOKEN_STRING] = {NULL, NULL, PREC_NONE},        // string
+    [TOKEN_STRING] = {string, NULL, PREC_NONE},      // string
     [TOKEN_INTERPOLATION] = {NULL, NULL, PREC_NONE}, // string interpolation
     [TOKEN_NUMBER] = {number, NULL, PREC_NONE},      // number
 

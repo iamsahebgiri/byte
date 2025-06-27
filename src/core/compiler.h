@@ -5,6 +5,7 @@
 #include "chunk.h"
 #include "scanner.h"
 #include "common.h"
+#include "object.h"
 
 typedef struct {
   Scanner* scanner;
@@ -34,7 +35,7 @@ typedef enum {
   PREC_PRIMARY
 } Precedence;
 
-typedef void (*ParseFn)();
+typedef void (*ParseFn)(Parser* parser);
 
 typedef struct {
   ParseFn prefix;
