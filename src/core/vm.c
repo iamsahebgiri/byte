@@ -31,10 +31,14 @@ static void runtimeError(const char *format, ...) {
 
 void initVM() {
   resetStack();
+  initTable(&vm.strings);
   vm.objects = NULL;
 }
 
-void freeVM() { freeObjects(); }
+void freeVM() {
+  freeTable(&vm.strings);
+  freeObjects();
+}
 
 void push(Value value) {
   *vm.stackTop = value;
