@@ -1,7 +1,7 @@
 #ifndef BYTE_MEMORY_H
 #define BYTE_MEMORY_H
 
-#include "common.h"
+#include "core/common.h"
 
 #define ALLOCATE(type, count) (type*)reallocate(NULL, 0, sizeof(type) * (count))
 

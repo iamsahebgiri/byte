@@ -1,8 +1,8 @@
 #ifndef BYTE_VM_H
 #define BYTE_VM_H
 
-#include "chunk.h"
-#include "value.h"
+#include "core/chunk.h"
+#include "core/value.h"
 
 #define STACK_MAX 256
 

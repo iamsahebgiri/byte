@@ -1,5 +1,5 @@
-CC             = gcc
-CFLAGS         = -fPIC
+CC             = clang
+CFLAGS         = -fPIC -Wall -Wextra
 DEBUG_CFLAGS   = -D DEBUG -g3 -Og
 RELEASE_CFLAGS = -g -O3
 LDFLAGS        = -lm
@@ -7,13 +7,13 @@ LDFLAGS        = -lm
 TARGET_EXEC = byte
 BUILD_DIR   = ./build/
 
-SRC_DIRS = ./src/core/
-INC_DIRS = ./src/include/
+SRC_DIRS = ./src/
 
 BIN_DIR = bin/
 OBJ_DIR = obj/
 
-SRCS := $(foreach DIR,$(SRC_DIRS),$(wildcard $(DIR)*.c))
+SRCS := $(shell find $(SRC_DIRS) -name '*.c')
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 OBJS := $(SRCS:.c=.o)
 DEPS := $(OBJS:.o=.d)
 
@@ -29,7 +29,7 @@ RELEASE_DIR     = $(BUILD_DIR)Release/
 RELEASE_TARGET  = $(RELEASE_DIR)$(BIN_DIR)$(TARGET_EXEC)
 RELEASE_OBJS   := $(addprefix $(RELEASE_DIR)$(OBJ_DIR), $(OBJS))
 
-.PHONY: debug release all clean
+.PHONY: debug release all clean run
 
 # default; target if run as `make`
 debug: $(DEBUG_TARGET)
@@ -53,6 +53,9 @@ $(RELEASE_DIR)$(OBJ_DIR)%.o: %.c
 	$(CC) $(CC_FLAGS) $(RELEASE_CFLAGS) -c $< -o $@
 
 all: debug release
+
+run: debug
+	$(DEBUG_TARGET)
 
 clean:
 	rm -rf $(BUILD_DIR)

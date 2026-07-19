@@ -33,5 +33,5 @@
 
 # Directories
 build/
-
-test.cpp
+build-meson/
+.cache

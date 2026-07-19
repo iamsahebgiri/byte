@@ -1,8 +1,6 @@
 #ifndef BYTE_VALUE_H
 #define BYTE_VALUE_H
 
-#include "common.h"
-
 typedef double Value;
 
 typedef struct {

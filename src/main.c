@@ -1,15 +1,12 @@
-#include "chunk.h"
-#include "common.h"
-#include "debug.h"
-#include "scanner.h"
-#include "vm.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "compiler/vm.h"
+#include "core/common.h"
+
 static void repl() {
-  printf("Byte v.0.1 \n");
+  printf("Byte v%d.%d.%d\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 
   char line[1024];
   for (;;) {
@@ -68,10 +65,8 @@ static void runFile(const char* path) {
   InterpretResult result = interpret(source);
   free(source);  // [owner]
 
-  if (result == INTERPRET_COMPILE_ERROR)
-    exit(65);
-  if (result == INTERPRET_RUNTIME_ERROR)
-    exit(70);
+  if (result == INTERPRET_COMPILE_ERROR) exit(65);
+  if (result == INTERPRET_RUNTIME_ERROR) exit(70);
 }
 
 int main(int argc, const char* argv[]) {
