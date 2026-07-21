@@ -1,0 +1,20 @@
+func main() {
+    print("Hello world")
+}
+
+let num = 10
+if num % 2 == 0 {
+    print("EVEN")
+} else {
+    print("ODD")
+}
+
+for i in 1..10 {
+    print(i)
+}
+
+class Animal {
+    init() {
+        print("constructor")
+    }
+}

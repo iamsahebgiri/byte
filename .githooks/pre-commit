@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+FILES=$(git diff --cached --name-only --diff-filter=ACM -- '*.c' '*.h')
+
+if [ -z "$FILES" ]; then
+  exit 0
+fi
+
+for file in $FILES; do
+  if [ ! -f "$file" ]; then
+    continue
+  fi
+  clang-format -i "$file"
+  git add "$file"
+done
