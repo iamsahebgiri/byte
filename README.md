@@ -44,3 +44,14 @@ Outputs to given below -
 0009    | OP_RETURN
 -0.821429
 ```
+
+## Pipelins
+- Scanner -> Compiler -> VM
+- Compiler -> 
+  - compile
+    - parser
+    - scanner
+    - start parsing the expr
+
+parsePrecedence
+- will parse for larger prec values

@@ -2,9 +2,9 @@
 #define BYTE_COMPILER_H
 
 #include <stdarg.h>
+
 #include "chunk.h"
 #include "scanner.h"
-#include "common.h"
 
 typedef struct {
   Scanner* scanner;
@@ -34,7 +34,7 @@ typedef enum {
   PREC_PRIMARY
 } Precedence;
 
-typedef void (*ParseFn)();
+typedef void (*ParseFn)(Parser*);
 
 typedef struct {
   ParseFn prefix;
