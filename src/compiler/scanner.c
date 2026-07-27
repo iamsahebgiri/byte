@@ -1,4 +1,5 @@
 #include "scanner.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +11,7 @@ void initScanner(Scanner* s, const char* source) {
   s->interpolatingCount = -1;
 }
 
-bool isAtEnd(Scanner* s) {
-  return *s->current == '\0';
-}
+bool isAtEnd(Scanner* s) { return *s->current == '\0'; }
 
 static Token makeToken(Scanner* s, TokenType type) {
   Token t;
@@ -42,21 +41,15 @@ static Token errorToken(Scanner* s, const char* message, ...) {
   return t;
 }
 
-static bool isDigit(char c) {
-  return c >= '0' && c <= '9';
-}
+static bool isDigit(char c) { return c >= '0' && c <= '9'; }
 
-static bool isBinary(char c) {
-  return c == '0' || c == '1';
-}
+static bool isBinary(char c) { return c == '0' || c == '1'; }
 
 static bool isAlpha(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-static bool isOctal(char c) {
-  return c >= '0' && c <= '7';
-}
+static bool isOctal(char c) { return c >= '0' && c <= '7'; }
 
 static bool isHex(char c) {
   return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
@@ -65,34 +58,25 @@ static bool isHex(char c) {
 
 static char advance(Scanner* s) {
   s->current++;
-  if (s->current[-1] == '\n')
-    s->line++;
+  if (s->current[-1] == '\n') s->line++;
   return s->current[-1];
 }
 
 static bool match(Scanner* s, char expected) {
-  if (isAtEnd(s))
-    return false;
-  if (*s->current != expected)
-    return false;
+  if (isAtEnd(s)) return false;
+  if (*s->current != expected) return false;
 
   s->current++;
-  if (s->current[-1] == '\n')
-    s->line++;
+  if (s->current[-1] == '\n') s->line++;
   return true;
 }
 
-static char current(Scanner* s) {
-  return *s->current;
-}
+static char current(Scanner* s) { return *s->current; }
 
-static char previous(Scanner* s) {
-  return s->current[-1];
-}
+static char previous(Scanner* s) { return s->current[-1]; }
 
 static char next(Scanner* s) {
-  if (isAtEnd(s))
-    return '\0';
+  if (isAtEnd(s)) return '\0';
   return s->current[1];
 }
 
@@ -109,8 +93,7 @@ static void skipWhitespace(Scanner* s) {
 
       // skip line comment
       case '#': {
-        while (current(s) != '\n' && !isAtEnd(s))
-          advance(s);
+        while (current(s) != '\n' && !isAtEnd(s)) advance(s);
         break;
       }
 
@@ -123,7 +106,7 @@ static void skipWhitespace(Scanner* s) {
 static Token string(Scanner* s, char quote) {
   while (current(s) != quote && !isAtEnd(s)) {
     if (current(s) == '$' && next(s) == '{' && previous(s) != '\\') {
-      if (s->interpolatingCount - 1 < MAX_INTERPOLATION_NESTING) {
+      if (s->interpolatingCount + 1 < MAX_INTERPOLATION_NESTING) {
         s->interpolatingCount++;
         s->interpolating[s->interpolatingCount] = (int)quote;
         s->current++;
@@ -150,15 +133,13 @@ static Token string(Scanner* s, char quote) {
 }
 
 Token number(Scanner* s) {
-  while (isDigit(current(s)))
-    advance(s);
+  while (isDigit(current(s))) advance(s);
 
   // See if it has a floating point. Make sure there is a digit after the "."
   // so we don't get confused by method calls on number literals.
   if (current(s) == '.' && isDigit(next(s))) {
     advance(s);
-    while (isDigit(current(s)))
-      advance(s);
+    while (isDigit(current(s))) advance(s);
   }
 
   // See if the number is in scientific notation.
@@ -172,16 +153,14 @@ Token number(Scanner* s) {
       return errorToken(s, "unterminated scientific notation");
     }
 
-    while (isDigit(current(s)))
-      advance(s);
+    while (isDigit(current(s))) advance(s);
   }
 
   return makeToken(s, TOKEN_NUMBER);
 }
 
 static Token identifier(Scanner* s) {
-  while (isAlpha(current(s)) || isDigit(current(s)))
-    advance(s);
+  while (isAlpha(current(s)) || isDigit(current(s))) advance(s);
 
   TokenType type = TOKEN_IDENTIFIER;
   size_t length = s->current - s->start;
@@ -202,8 +181,7 @@ Token scanToken(Scanner* s) {
 
   s->start = s->current;
 
-  if (isAtEnd(s))
-    return makeToken(s, TOKEN_EOF);
+  if (isAtEnd(s)) return makeToken(s, TOKEN_EOF);
 
   char c = advance(s);
 

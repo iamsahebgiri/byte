@@ -5,6 +5,7 @@
 
 #include "chunk.h"
 #include "common.h"
+#include "object.h"
 #include "scanner.h"
 #include "value.h"
 
@@ -177,6 +178,12 @@ static void number(Parser* parser) {
   emitConstant(parser, NUMBER_VAL(value));
 }
 
+static void string(Parser* parser) {
+  // copy from lexeme and removes the quotes from both ends
+  emitConstant(parser, OBJ_VAL(copyString(parser->previous.start + 1,
+                                          parser->previous.length - 2)));
+}
+
 static void unary(Parser* parser) {
   TokenType operatorType = parser->previous.type;
 
@@ -266,7 +273,7 @@ ParseRule rules[] = {
     [TOKEN_CARET_EQUAL] = {NULL, NULL, PREC_NONE},  // ^=
 
     [TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},     // identifier
-    [TOKEN_STRING] = {NULL, NULL, PREC_NONE},         // string
+    [TOKEN_STRING] = {string, NULL, PREC_NONE},       // string
     [TOKEN_INTERPOLATION] = {NULL, NULL, PREC_NONE},  // string interpolation
     [TOKEN_NUMBER] = {number, NULL, PREC_NONE},       // number
 
