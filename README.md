@@ -55,3 +55,9 @@ Outputs to given below -
 
 parsePrecedence
 - will parse for larger prec values
+
+```
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+make
+byte ../test/basic.byte
+```

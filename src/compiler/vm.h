@@ -3,6 +3,7 @@
 
 #include "core/chunk.h"
 #include "core/value.h"
+#include "table.h"
 
 #define STACK_MAX 256
 
@@ -11,7 +12,8 @@ typedef struct {
   uint8_t* ip;
   Value stack[STACK_MAX];
   Value* stackTop;
-  Obj* objects;  // head of linked list
+  Table strings;  // pool for string interning
+  Obj* objects;   // head of linked list for heap values
 } VM;
 
 typedef enum {

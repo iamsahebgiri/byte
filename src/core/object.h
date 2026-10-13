@@ -1,6 +1,8 @@
 #ifndef BYTE_OBJECT_H
 #define BYTE_OBJECT_H
 
+#include <stdint.h>
+
 #include "value.h"
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
@@ -19,9 +21,10 @@ struct Obj {
 };
 
 struct ObjString {
-  Obj obj;
+  Obj obj;  // this called type prunning or single inheritance in c
   int length;
   char* chars;
+  uint32_t hash;
 };
 
 ObjString* takeString(char* chars, int length);
