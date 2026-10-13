@@ -1,5 +1,6 @@
 #include "compiler.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -63,7 +64,7 @@ static void advance(Parser* parser) {
 
   while (true) {
     parser->current = scanToken(parser->scanner);
-    if (parser->current.type != TOKEN_EOF) break;
+    if (parser->current.type != TOKEN_ERROR) break;
     errorAtCurrent(parser, parser->current.start);
   }
 }
@@ -75,6 +76,16 @@ static void consume(Parser* parser, TokenType type, const char* message) {
   }
 
   errorAtCurrent(parser, message);
+}
+
+static bool check(Parser* parser, TokenType type) {
+  return parser->current.type == type;
+}
+
+static bool match(Parser* parser, TokenType type) {
+  if (!check(parser, type)) return false;
+  advance(parser);
+  return true;
 }
 
 void emitByte(Parser* parser, uint8_t byte) {
@@ -102,6 +113,8 @@ static void endCompiler(Parser* parser) { emitReturn(parser); }
 
 // forward declaration
 static void expression(Parser* parser);
+static void statement(Parser* parser);
+static void declaration(Parser* parser);
 static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Parser* parser, Precedence precedence);
 // end forward declaration
@@ -205,6 +218,33 @@ static void unary(Parser* parser) {
 
 static void expression(Parser* parser) {
   parsePrecedence(parser, PREC_ASSIGNMENT);
+}
+
+static void printStatement(Parser* parser) {
+  expression(parser);
+  if (!match(parser, TOKEN_SEMICOLON)) {
+    consume(parser, TOKEN_NEWLINE, "Expect ';' after value.");
+  }
+  emitByte(parser, OP_PRINT);
+}
+
+static void declaration(Parser* parser) { statement(parser); }
+
+static void statement(Parser* parser) {
+  if (match(parser, TOKEN_PRINT)) {
+    printStatement(parser);
+    return;
+  }
+  if (match(parser, TOKEN_NEWLINE)) return;
+
+  // No progress would mean an infinite loop in compile(), so always advance.
+  errorAtCurrent(parser, "Expect statement.");
+  while (!check(parser, TOKEN_NEWLINE) && !check(parser, TOKEN_SEMICOLON) &&
+         !check(parser, TOKEN_EOF)) {
+    advance(parser);
+  }
+  match(parser, TOKEN_NEWLINE);
+  match(parser, TOKEN_SEMICOLON);
 }
 
 static void parsePrecedence(Parser* parser, Precedence precedence) {
@@ -318,9 +358,9 @@ bool compile(const char* source, Chunk* chunk) {
   parser.panicMode = false;
 
   advance(&parser);
-  expression(&parser);
-  // consume(&parser, TOKEN_EOF, "Expect end of expression.");
-
+  while (!match(&parser, TOKEN_EOF)) {
+    declaration(&parser);
+  }
   endCompiler(&parser);
 
 #ifdef DEBUG_PRINT_CODE
