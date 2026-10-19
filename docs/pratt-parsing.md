@@ -51,7 +51,7 @@ loosest to tightest:
 
 ```
 PREC_NONE
-PREC_ASSIGNMENT    =, +=, ...         (reserved, see Known gaps)
+PREC_ASSIGNMENT    =, +=, ...         (see Assignment)
 PREC_OR            or
 PREC_AND           and
 PREC_EQUALITY      == !=
@@ -96,12 +96,18 @@ static void parsePrecedence(Parser* parser, Precedence precedence) {
     errorAtCurrent(parser, "Expect expression.");
     return;
   }
-  prefixRule(parser);                       // build one "atom"
+
+  bool canAssign = precedence <= PREC_ASSIGNMENT;
+  prefixRule(parser, canAssign);
 
   while (precedence <= getRule(parser->current.type)->precedence) {
     advance(parser);
     ParseFn infixRule = getRule(parser->previous.type)->infix;
-    infixRule(parser);                      // extend the atom leftward
+    infixRule(parser, canAssign);
+  }
+
+  if (canAssign && match(parser, TOKEN_EQUAL)) {
+    error(parser, "Invalid assignment target.");
   }
 }
 
@@ -118,6 +124,10 @@ Two details worth noticing:
 - The stopping condition `precedence <= getRule(current)->precedence` is
   checked against the **lookahead token**, not the operator just handled.
   That check _is_ the algorithm.
+- Every parse function also receives a `canAssign` flag. `=` has no entry in
+  the infix table at all; the identifier's **prefix** rule consumes it
+  directly (see below), and anything stuck next to an `=` that cannot be
+  assigned to is caught by the trailing check → `Invalid assignment target.`
 
 ## Walkthrough
 
@@ -140,24 +150,45 @@ expression.` and returns immediately — the owning statement's recovery
 (`synchronize()`) takes over from there. There is no deep call stack to
 unwind, because every precedence level is the _same_ function.
 
+## Assignment (implemented, off the table)
+
+`=` is an interesting case: it has **no row in the infix table at all**
+(`TOKEN_EQUAL` sits at `PREC_NONE`). Assignment lives in the *prefix* rule
+instead:
+
+```c
+static void namedVariable(Parser* parser, Token name, bool canAssign) {
+  uint8_t arg = identifierConstant(parser, &name);
+  if (canAssign && match(parser, TOKEN_EQUAL)) {
+    expression(parser);                      // right-hand side
+    emitBytes(parser, OP_SET_GLOBAL, arg);
+  } else {
+    emitBytes(parser, OP_GET_GLOBAL, arg);
+  }
+}
+```
+
+- `canAssign` is `precedence <= PREC_ASSIGNMENT`, so who exactly is allowed
+  to look for `=` is decided by *where in the precedence climb* the prefix
+  rule is being invoked from, not by the table.
+- Because the right-hand side is parsed with its own `expression()` call
+  (not through the infix loop), `a = b = 1` nests right-associatively.
+- After the infix loop, prefixes that were not allowed to assign but are
+  still facing `=` produce `Invalid assignment target.` `a * b = 2` is,
+  correctly, a compile error, while `a = b * 2` is fine.
+
 ## Known gaps / roadmap
 
 The `PREC_*` ladder exists, but several tiers have no parse functions wired
 in yet (their `rules[]` entries are `NULL`), so those constructs are currently
 rejected by the parser:
 
-- **`PREC_ASSIGNMENT`** — `=` and compound assignments are not accepted; `let`
-  is the only way to create a binding (see [language.md](language.md)).
-  `TOKEN_EQUAL` currently maps to `PREC_NONE`. When adding assignment, give
-  `=` the `PREC_ASSIGNMENT` row so the engine stops at it, and handle the
-  assignment inside the identifier's prefix rule (`variable()` matching `=`
-  and compiling the right-hand side with `expression()`). Since the RHS is
-  parsed with a matching `match('=')` inside the function (not via the infix
-  loop), `a = b = 1` nests right-associatively.
 - **`PREC_OR` / `PREC_AND`** — `or`/`and` infix functions emitting
   short-circuit jumps.
 - **`PREC_RANGE`** — `..` ranges for `for i in 1..10` loops.
 - **`PREC_CALL`** — calls and member access (`.`).
+- Compound assignment (`+=`, `-=`, ...) — rows exist in `scanner.h` but
+  nothing parses them yet.
 
 Failing loudly (`Expect expression.`) is fine while the language is small,
 but the ladder already sits in the order the grammar should grow into.

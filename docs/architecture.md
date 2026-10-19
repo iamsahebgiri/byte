@@ -31,10 +31,18 @@ in memory at run time.
 - `ParseRule` associates each token type with its prefix parse function
   (literal? variable? grouping?), its infix function, and its binding power
   (`PREC_*`). `parsePrecedence` keeps consuming tokens at higher precedence
-  levels, which makes operators "larger precedence" naturally added.
+  levels, and passes a `canAssign` flag down so that only full-expression
+  positions may compile an assignment. See [pratt-parsing.md](pratt-parsing.md)
+  for notes on how Pratt parsing works.
+- Every statement is finished by the shared `terminator()` helper, which
+  accepts `;`, a newline, or EOF as the end of the statement — blank lines
+  are skipped by `declaration()`.
 - Each statement compiles immediately into the current `Chunk`; there is no
   AST. Constants (numbers, strings, identifiers) are stored in the chunk's
   constant pool and referenced by index.
+- Error recovery is centralized: parse functions report through
+  `errorAt`/`errorAtCurrent` and enter `panicMode`; `declaration()`
+  synchronizes to the next statement after each statement on error.
 
 ## Core data structures
 
