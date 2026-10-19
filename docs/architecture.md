@@ -38,14 +38,14 @@ in memory at run time.
 
 ## Core data structures
 
-| Component      | Files                              | Purpose                                |
-| ---------------| -----------------------------------+ -------------------------------------- |
-| `Value`/`Obj`  | `src/core/value.c`, `src/core/object.c` | tagged value and heap objects (interned strings) |
-| `Chunk`        | `src/core/chunk.c`                 | growable bytecode array + constants    |
-| `Table`        | `src/core/table.c`                 | linear-probe hash table (string interning, globals) |
-| `Scanner`      | `src/compiler/scanner.c`           | on-demand tokenizer, tracks line numbers |
-| `Compiler`     | `src/compiler/compiler.c`          | single-pass statement parser + expression compiler |
-| `VM`           | `src/compiler/vm.c`                | expression stack, dispatch loop        |
+| Component     | Files                                   | Purpose                                             |
+| ------------- | --------------------------------------- | --------------------------------------------------- |
+| `Value`/`Obj` | `src/core/value.c`, `src/core/object.c` | tagged value and heap objects (interned strings)    |
+| `Chunk`       | `src/core/chunk.c`                      | growable bytecode array + constants                 |
+| `Table`       | `src/core/table.c`                      | linear-probe hash table (string interning, globals) |
+| `Scanner`     | `src/compiler/scanner.c`                | on-demand tokenizer, tracks line numbers            |
+| `Compiler`    | `src/compiler/compiler.c`               | single-pass statement parser + expression compiler  |
+| `VM`          | `src/compiler/vm.c`                     | expression stack, dispatch loop                     |
 
 ## Debug output
 
