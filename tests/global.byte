@@ -1,0 +1,5 @@
+let firstName = "john"
+let lastName = "doe"
+let name = firstName + " " + lastName
+
+print name

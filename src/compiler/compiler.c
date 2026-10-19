@@ -1,6 +1,7 @@
 #include "compiler.h"
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -119,6 +120,19 @@ static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Parser* parser, Precedence precedence);
 // end forward declaration
 
+static uint8_t identifierConstant(Parser* parser, Token* name) {
+  return makeConstant(parser, OBJ_VAL(copyString(name->start, name->length)));
+}
+
+static uint8_t parseVariable(Parser* parser, const char* errorMessage) {
+  consume(parser, TOKEN_IDENTIFIER, errorMessage);
+  return identifierConstant(parser, &parser->previous);
+}
+
+static void defineVariable(Parser* parser, uint8_t global) {
+  emitBytes(parser, OP_DEFINE_GLOBAL, global);
+}
+
 static void binary(Parser* parser) {
   TokenType operatorType = parser->previous.type;
 
@@ -197,6 +211,15 @@ static void string(Parser* parser) {
                                           parser->previous.length - 2)));
 }
 
+static void namedVariable(Parser* parser, Token name) {
+  uint8_t arg = identifierConstant(parser, &name);
+  emitBytes(parser, OP_GET_GLOBAL, arg);
+}
+
+static void variable(Parser* parser) {
+  namedVariable(parser, parser->previous);
+}
+
 static void unary(Parser* parser) {
   TokenType operatorType = parser->previous.type;
 
@@ -220,10 +243,25 @@ static void expression(Parser* parser) {
   parsePrecedence(parser, PREC_ASSIGNMENT);
 }
 
+static void varDeclaration(Parser* parser) {
+  uint8_t global = parseVariable(parser, "Expect variable name.");
+  if (match(parser, TOKEN_EQUAL)) {
+    expression(parser);
+  } else {
+    emitByte(parser, OP_NIL);
+  }
+  if (!match(parser, TOKEN_SEMICOLON)) {
+    consume(parser, TOKEN_NEWLINE,
+            "Expect newline or ';' after variable declaration.");
+  }
+
+  defineVariable(parser, global);
+}
+
 static void printStatement(Parser* parser) {
   expression(parser);
   if (!match(parser, TOKEN_SEMICOLON)) {
-    consume(parser, TOKEN_NEWLINE, "Expect ';' after value.");
+    consume(parser, TOKEN_NEWLINE, "Expect newline or ';' after value.");
   }
   emitByte(parser, OP_PRINT);
 }
@@ -252,12 +290,21 @@ static void synchronize(Parser* parser) {
 }
 static void expressionStatement(Parser* parser) {
   expression(parser);
-  consume(parser, TOKEN_SEMICOLON, "Expect ';' after expression.");
+  if (!match(parser, TOKEN_SEMICOLON)) {
+    consume(parser, TOKEN_NEWLINE, "Expect newline or ';' after expression.");
+  }
   emitByte(parser, OP_POP);
 }
 
 static void declaration(Parser* parser) {
-  statement(parser);
+  // Skip blank lines (and any newline left over from a ';' statement).
+  if (match(parser, TOKEN_NEWLINE)) return;
+
+  if (match(parser, TOKEN_LET)) {
+    varDeclaration(parser);
+  } else {
+    statement(parser);
+  }
 
   if (parser->panicMode) {
     synchronize(parser);
@@ -348,10 +395,10 @@ ParseRule rules[] = {
     [TOKEN_AMP_EQUAL] = {NULL, NULL, PREC_NONE},    // &=
     [TOKEN_CARET_EQUAL] = {NULL, NULL, PREC_NONE},  // ^=
 
-    [TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},     // identifier
-    [TOKEN_STRING] = {string, NULL, PREC_NONE},       // string
-    [TOKEN_INTERPOLATION] = {NULL, NULL, PREC_NONE},  // string interpolation
-    [TOKEN_NUMBER] = {number, NULL, PREC_NONE},       // number
+    [TOKEN_IDENTIFIER] = {variable, NULL, PREC_NONE},  // identifier
+    [TOKEN_STRING] = {string, NULL, PREC_NONE},        // string
+    [TOKEN_INTERPOLATION] = {NULL, NULL, PREC_NONE},   // string interpolation
+    [TOKEN_NUMBER] = {number, NULL, PREC_NONE},        // number
 
     // Keywords.
     [TOKEN_AND] = {NULL, NULL, PREC_NONE},       // and

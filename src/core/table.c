@@ -135,5 +135,8 @@ ObjString* tableFindString(Table* table, const char* chars, int length,
                memcmp(entry->key->chars, chars, length) == 0) {
       return entry->key;
     }
+
+    // otherwise keep probing (collision or tombstone)
+    index = (index + 1) % table->capacity;
   }
 }

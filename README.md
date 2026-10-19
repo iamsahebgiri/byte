@@ -1,63 +1,46 @@
-## Disassembler
+# Byte
 
-```c
-initVM();
-Chunk chunk;
-initChunk(&chunk);
-int constant = addConstant(&chunk, 1.2);
-writeChunk(&chunk, OP_CONSTANT, 123);
-writeChunk(&chunk, constant, 123);
+Byte is a small bytecode interpreter written in C: a single-pass compiler that
+turns source into bytecode chunks, and a stack VM that executes them on an
+expression stack.
 
-constant = addConstant(&chunk, 3.4);
-writeChunk(&chunk, OP_CONSTANT, 123);
-writeChunk(&chunk, constant, 123);
-
-writeChunk(&chunk, OP_ADD, 123);
-
-constant = addConstant(&chunk, 5.6);
-writeChunk(&chunk, OP_CONSTANT, 123);
-writeChunk(&chunk, constant, 123);
-
-writeChunk(&chunk, OP_DIVIDE, 123);
-writeChunk(&chunk, OP_NEGATE, 123);
-
-writeChunk(&chunk, OP_RETURN, 123);
-interpret(&chunk);
-freeVM();
+```text
+# tests/print.byte
+print 1 + 2
+# 3
 ```
 
-Outputs to given below -
+Statements can be terminated by a newline or a `;`. See
+[docs/language.md](docs/language.md) for the full grammar.
 
-```
-0000  123 OP_CONSTANT         0 '1.2'
-          [ 1.2 ]
-0002    | OP_CONSTANT         1 '3.4'
-          [ 1.2 ][ 3.4 ]
-0004    | OP_ADD
-          [ 4.6 ]
-0005    | OP_CONSTANT         2 '5.6'
-          [ 4.6 ][ 5.6 ]
-0007    | OP_DIVIDE
-          [ 0.821429 ]
-0008    | OP_NEGATE
-          [ -0.821429 ]
-0009    | OP_RETURN
--0.821429
+## Quickstart
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug   # configure
+cmake --build build                            # build
+
+./build/byte tests/print.byte                  # run a program file
+./build/byte                                   # start the REPL
 ```
 
-## Pipelins
-- Scanner -> Compiler -> VM
-- Compiler -> 
-  - compile
-    - parser
-    - scanner
-    - start parsing the expr
+## Tests
 
-parsePrecedence
-- will parse for larger prec values
+Language tests are `.byte` programs in `tests/`, verified against snapshots in
+`tests/golden/` (each snapshot pins a test's exit code, output and errors).
 
+```bash
+./tests/run.sh                 # run the suite
+./tests/run.sh --update        # regenerate snapshots after an intentional change
+ctest --test-dir build         # same suite through CMake/CTest
 ```
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-make
-byte ../test/basic.byte
-```
+
+See the header of `tests/run.sh` for details.
+
+## Documentation
+
+| Document                                     | Contents                             |
+| ---------------------------------------------| ------------------------------------- |
+| [Language & grammar](docs/language.md)       | statement forms, termination rules, semantics |
+| [Architecture](docs/architecture.md)         | scanner → compiler → VM pipeline, Pratt expressions |
+| [Debugging](docs/debugging.md)               | disassembly and VM trace output      |
+| [Pratt parsing](docs/pratt-parsing.md)       | notes on how expression parsing works |

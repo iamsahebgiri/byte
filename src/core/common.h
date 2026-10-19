@@ -12,8 +12,13 @@
 #define _GNU_SOURCE 1
 #endif
 
+// Turned on with: cmake -S . -B build -DBYTE_DEBUG_TRACE=ON
+// Prints disassembly/trace info while compiling and running,
+// which pollutes program output (e.g. the test snapshots).
+#ifdef BYTE_DEBUG_TRACE
 #define DEBUG_PRINT_CODE
 #define DEBUG_TRACE_EXECUTION
+#endif
 
 #define BYTE_COPYRIGHT "Copyright (c) 2023 Saheb Giri"
 
