@@ -133,7 +133,7 @@ static void defineVariable(Parser* parser, uint8_t global) {
   emitBytes(parser, OP_DEFINE_GLOBAL, global);
 }
 
-static void binary(Parser* parser) {
+static void binary(Parser* parser, bool canAssign) {
   TokenType operatorType = parser->previous.type;
 
   ParseRule* rule = getRule(operatorType);
@@ -175,7 +175,7 @@ static void binary(Parser* parser) {
   }
 }
 
-static void literal(Parser* parser) {
+static void literal(Parser* parser, bool canAssign) {
   switch (parser->previous.type) {
     case TOKEN_TRUE:
       emitByte(parser, OP_TRUE);
@@ -191,7 +191,7 @@ static void literal(Parser* parser) {
   }
 }
 
-static void grouping(Parser* parser) {
+static void grouping(Parser* parser, bool canAssign) {
   expression(parser);
   consume(parser, TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
 }
@@ -200,27 +200,32 @@ static void emitConstant(Parser* parser, Value value) {
   emitBytes(parser, OP_CONSTANT, makeConstant(parser, value));
 }
 
-static void number(Parser* parser) {
+static void number(Parser* parser, bool canAssign) {
   double value = strtod(parser->previous.start, NULL);
   emitConstant(parser, NUMBER_VAL(value));
 }
 
-static void string(Parser* parser) {
+static void string(Parser* parser, bool canAssign) {
   // copy from lexeme and removes the quotes from both ends
   emitConstant(parser, OBJ_VAL(copyString(parser->previous.start + 1,
                                           parser->previous.length - 2)));
 }
 
-static void namedVariable(Parser* parser, Token name) {
+static void namedVariable(Parser* parser, Token name, bool canAssign) {
   uint8_t arg = identifierConstant(parser, &name);
-  emitBytes(parser, OP_GET_GLOBAL, arg);
+  if (canAssign && match(parser, TOKEN_EQUAL)) {
+    expression(parser);
+    emitBytes(parser, OP_SET_GLOBAL, arg);
+  } else {
+    emitBytes(parser, OP_GET_GLOBAL, arg);
+  }
 }
 
-static void variable(Parser* parser) {
-  namedVariable(parser, parser->previous);
+static void variable(Parser* parser, bool canAssign) {
+  namedVariable(parser, parser->previous, canAssign);
 }
 
-static void unary(Parser* parser) {
+static void unary(Parser* parser, bool canAssign) {
   TokenType operatorType = parser->previous.type;
 
   // compile the operand
@@ -243,6 +248,15 @@ static void expression(Parser* parser) {
   parsePrecedence(parser, PREC_ASSIGNMENT);
 }
 
+// Statement terminator: ';' or newline. EOF is also accepted, which lets the
+// final statement of a source omit its terminator.
+static void terminator(Parser* parser, const char* message) {
+  if (match(parser, TOKEN_SEMICOLON) || match(parser, TOKEN_NEWLINE)) return;
+  if (check(parser, TOKEN_EOF)) return;
+
+  consume(parser, TOKEN_NEWLINE, message);
+}
+
 static void varDeclaration(Parser* parser) {
   uint8_t global = parseVariable(parser, "Expect variable name.");
   if (match(parser, TOKEN_EQUAL)) {
@@ -250,19 +264,14 @@ static void varDeclaration(Parser* parser) {
   } else {
     emitByte(parser, OP_NIL);
   }
-  if (!match(parser, TOKEN_SEMICOLON)) {
-    consume(parser, TOKEN_NEWLINE,
-            "Expect newline or ';' after variable declaration.");
-  }
+  terminator(parser, "Expect newline or ';' after variable declaration.");
 
   defineVariable(parser, global);
 }
 
 static void printStatement(Parser* parser) {
   expression(parser);
-  if (!match(parser, TOKEN_SEMICOLON)) {
-    consume(parser, TOKEN_NEWLINE, "Expect newline or ';' after value.");
-  }
+  terminator(parser, "Expect newline or ';' after value.");
   emitByte(parser, OP_PRINT);
 }
 
@@ -290,9 +299,7 @@ static void synchronize(Parser* parser) {
 }
 static void expressionStatement(Parser* parser) {
   expression(parser);
-  if (!match(parser, TOKEN_SEMICOLON)) {
-    consume(parser, TOKEN_NEWLINE, "Expect newline or ';' after expression.");
-  }
+  terminator(parser, "Expect newline or ';' after expression.");
   emitByte(parser, OP_POP);
 }
 
@@ -314,20 +321,9 @@ static void declaration(Parser* parser) {
 static void statement(Parser* parser) {
   if (match(parser, TOKEN_PRINT)) {
     printStatement(parser);
-    return;
   } else {
     expressionStatement(parser);
   }
-  if (match(parser, TOKEN_NEWLINE)) return;
-
-  // No progress would mean an infinite loop in compile(), so always advance.
-  errorAtCurrent(parser, "Expect statement.");
-  while (!check(parser, TOKEN_NEWLINE) && !check(parser, TOKEN_SEMICOLON) &&
-         !check(parser, TOKEN_EOF)) {
-    advance(parser);
-  }
-  match(parser, TOKEN_NEWLINE);
-  match(parser, TOKEN_SEMICOLON);
 }
 
 static void parsePrecedence(Parser* parser, Precedence precedence) {
@@ -338,12 +334,18 @@ static void parsePrecedence(Parser* parser, Precedence precedence) {
     errorAtCurrent(parser, "Expect expression.");
     return;
   }
-  prefixRule(parser);
+
+  bool canAssign = precedence <= PREC_ASSIGNMENT;
+  prefixRule(parser, canAssign);
 
   while (precedence <= getRule(parser->current.type)->precedence) {
     advance(parser);
     ParseFn infixRule = getRule(parser->previous.type)->infix;
-    infixRule(parser);
+    infixRule(parser, canAssign);
+  }
+
+  if (canAssign && match(parser, TOKEN_EQUAL)) {
+    error(parser, "Invalid assignment target.");
   }
 }
 
