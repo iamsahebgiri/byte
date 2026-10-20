@@ -1,0 +1,7 @@
+func a() { b() }
+func b() { c() }
+func c() {
+  c("too", "many")
+}
+
+a()

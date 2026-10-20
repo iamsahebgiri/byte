@@ -35,8 +35,9 @@ in memory at run time.
   positions may compile an assignment. See [pratt-parsing.md](pratt-parsing.md)
   for notes on how Pratt parsing works.
 - Every statement is finished by the shared `terminator()` helper, which
-  accepts `;`, a newline, or EOF as the end of the statement — blank lines
-  are skipped by `declaration()`.
+  accepts `;`, a newline, EOF, or a closing `}` (for the last statement in a
+  block) as the end of the statement — blank lines are skipped by
+  `declaration()`.
 - The whole parser (and its `Scanner`) is a single file-scope instance in
   `src/compiler/compiler.c` — the compiler is single-pass and compiles one
   source at a time, so internal functions take no `Parser*` argument.

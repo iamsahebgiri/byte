@@ -1,0 +1,8 @@
+func areWeHavingItYet() {
+  print "Yes we are!"
+  return nil
+}
+
+print areWeHavingItYet
+
+print(areWeHavingItYet())

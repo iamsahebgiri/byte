@@ -8,11 +8,15 @@ Language-level reference for the grammar implemented in the compiler
 
 ```
 program     -> ( newline | declaration )* EOF
-declaration -> letDecl | statement
-statement   -> printStmt | ifStmt | whileStmt | forStmt | block | exprStmt
+declaration -> letDecl | funcDecl | statement
+statement   -> printStmt | ifStmt | whileStmt | forStmt
+             | returnStmt | block | exprStmt
 
 letDecl     -> "let" IDENTIFIER ( "=" expression )? terminator
+funcDecl    -> "func" IDENTIFIER "(" parameters? ")" block
+parameters  -> IDENTIFIER ( "," IDENTIFIER )*
 printStmt   -> "print" expression     terminator
+returnStmt  -> "return" expression?   terminator
 exprStmt    -> expression             terminator
 block       -> "{" ( newline | declaration )* "}"
 
@@ -23,7 +27,7 @@ forInit     -> ( "let" )? IDENTIFIER ( "=" expression )?
 
 expression  -> equality ( "=" expression )?   # assignment, right-assoc
 
-terminator  -> ";" | NEWLINE
+terminator  -> ";" | NEWLINE | EOF | "}"   # "}" only ends a block's last statement
 newline     -> NEWLINE
 ```
 
@@ -67,14 +71,67 @@ for i = 0; i < 10; i += 1 {
 - The loop variable is not visible after the loop.
 - The header may span multiple lines.
 
+## Functions and `return`
+
+Functions are declared with `func`, a parameter list, and a block body:
+
+```
+func add(a, b) {
+    return a + b
+}
+
+func greet() {
+    print "hello"
+}
+```
+
+`return` ends the current function:
+
+- **Bare return** — `return` followed by a terminator returns `nil`:
+
+  ```
+  func find() {
+      return
+  }
+  ```
+
+- **Value return** — `return expression` returns that value:
+
+  ```
+  func double(n) {
+      return n * 2
+  }
+  ```
+
+- A value must start on the same line as `return`. A newline immediately after
+  `return` is a bare return; the next line is a separate statement.
+- If control reaches the end of a function without a `return`, the function
+  returns `nil`.
+
+Like every other statement, `return` uses `terminator()`:
+
+| Form                     | Valid because                          |
+| ------------------------ | -------------------------------------- |
+| `return`                 | newline ends the statement             |
+| `return;`                | `;` ends the statement                 |
+| `return 42`              | newline ends the statement             |
+| `return 42;`             | `;` ends the statement                 |
+| `func f() { return 42 }` | `}` ends the last statement in a block |
+
+> **Implementation status:** return syntax compiles to `OP_NIL`/value followed
+> by `OP_RETURN`. The VM currently treats `OP_RETURN` as the end of execution;
+> it does not yet pop the call frame and resume the caller.
+
 ## Statement termination
 
 Statements end with `terminator()` in `src/compiler/compiler.c`:
 
 - **Newline or `;`** both terminate a statement (`terminator`); either works for
-  `let`, `print`, and expression statements.
+  `let`, `print`, `return`, and expression statements.
 - The final statement of a source may also end at **EOF** — no trailing
   newline needed for files or REPL input.
+- The last statement in a block may end directly at **`}`**, so one-line
+  bodies such as `func f() { return 42 }` are allowed.
 - Semicolons allow multiple statements on one line:
 
   ```
