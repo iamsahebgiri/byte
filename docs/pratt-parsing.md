@@ -181,18 +181,29 @@ static void namedVariable(Token name, bool canAssign) {
   still facing `=` produce `Invalid assignment target.` `a * b = 2` is,
   correctly, a compile error, while `a = b * 2` is fine.
 
+## Compound assignment
+
+`+=`, `-=`, `*=` and `/=` are handled in `namedVariable()` too, alongside `=`.
+After the target has been resolved, the operator compiles as a read, the
+right-hand expression, the arithmetic opcode, and a write:
+
+```
+a += b   ->  GET a; <b>; ADD; SET a
+```
+
+The operator token has no infix-table row, so only a plain identifier target
+is accepted, just like `=`.
+
 ## Known gaps / roadmap
 
-The `PREC_*` ladder exists, but several tiers have no parse functions wired
-in yet (their `rules[]` entries are `NULL`), so those constructs are currently
+The `PREC_*` ladder exists, but some tiers have no parse functions wired in yet
+(their `rules[]` entries are `NULL`), so those constructs are currently
 rejected by the parser:
 
-- **`PREC_OR` / `PREC_AND`** — `or`/`and` infix functions emitting
-  short-circuit jumps.
-- **`PREC_RANGE`** — `..` ranges for `for i in 1..10` loops.
+- **`PREC_RANGE`** — `..` ranges.
 - **`PREC_CALL`** — calls and member access (`.`).
-- Compound assignment (`+=`, `-=`, ...) — rows exist in `scanner.h` but
-  nothing parses them yet.
+- The remaining compound operators (`%=`, `**=`, bitwise assignments) are
+  tokenized but not compiled.
 
 Failing loudly (`Expect expression.`) is fine while the language is small,
 but the ladder already sits in the order the grammar should grow into.

@@ -109,6 +109,13 @@ static bool match(TokenType type) {
   return true;
 }
 
+// Newlines separate statements, but they are insignificant in a few places
+// such as between `}` and `else`. This skips any that are present.
+static void skipNewlines() {
+  while (match(TOKEN_NEWLINE)) {
+  }
+}
+
 static void emitByte(uint8_t byte) {
   writeChunk(currentChunk(), byte, parser.previous.line);
 }
@@ -116,6 +123,23 @@ static void emitByte(uint8_t byte) {
 static void emitBytes(uint8_t byte1, uint8_t byte2) {
   emitByte(byte1);
   emitByte(byte2);
+}
+
+static void emitLoop(int loopStart) {
+  emitByte(OP_LOOP);
+
+  int offset = currentChunk()->count - loopStart + 2;
+  if (offset > UINT16_MAX) error("Loop body too large.");
+
+  emitByte((offset >> 8) & 0xff);
+  emitByte(offset & 0xff);
+}
+
+static int emitJump(uint8_t instruction) {
+  emitByte(instruction);
+  emitByte(0xff);
+  emitByte(0xff);
+  return currentChunk()->count - 2;
 }
 
 static void emitReturn() { emitByte(OP_RETURN); }
@@ -128,6 +152,22 @@ static uint8_t makeConstant(Value value) {
   }
 
   return (uint8_t)constant;
+}
+
+static void emitConstant(Value value) {
+  emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
+static void patchJump(int offset) {
+  // -2 to adjust for the bytecode for the jump offset itself.
+  int jump = currentChunk()->count - offset - 2;
+
+  if (jump > UINT16_MAX) {
+    error("Too much code to jump over.");
+  }
+
+  currentChunk()->code[offset] = (jump >> 8) & 0xff;
+  currentChunk()->code[offset + 1] = jump & 0xff;
 }
 
 static void endCompiler() { emitReturn(); }
@@ -222,6 +262,15 @@ static void defineVariable(uint8_t global) {
   emitBytes(OP_DEFINE_GLOBAL, global);
 }
 
+static void and_(bool canAssign) {
+  int endJump = emitJump(OP_JUMP_IF_FALSE);
+
+  emitByte(OP_POP);
+  parsePrecedence(PREC_AND);
+
+  patchJump(endJump);
+}
+
 static void binary(bool canAssign) {
   TokenType operatorType = parser.previous.type;
 
@@ -285,19 +334,57 @@ static void grouping(bool canAssign) {
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
 }
 
-static void emitConstant(Value value) {
-  emitBytes(OP_CONSTANT, makeConstant(value));
-}
-
 static void number(bool canAssign) {
   double value = strtod(parser.previous.start, NULL);
   emitConstant(NUMBER_VAL(value));
+}
+
+static void or_(bool canAssign) {
+  int elseJump = emitJump(OP_JUMP_IF_FALSE);
+  int endJump = emitJump(OP_JUMP);
+
+  patchJump(elseJump);
+  emitByte(OP_POP);
+
+  parsePrecedence(PREC_OR);
+  patchJump(endJump);
 }
 
 static void string(bool canAssign) {
   // copy from lexeme and removes the quotes from both ends
   emitConstant(OBJ_VAL(
       copyString(parser.previous.start + 1, parser.previous.length - 2)));
+}
+
+static bool isCompoundAssignment(TokenType type) {
+  switch (type) {
+    case TOKEN_PLUS_EQUAL:
+    case TOKEN_MINUS_EQUAL:
+    case TOKEN_STAR_EQUAL:
+    case TOKEN_SLASH_EQUAL:
+      return true;
+    default:
+      return false;
+  }
+}
+
+static void emitCompoundOp(TokenType type) {
+  switch (type) {
+    case TOKEN_PLUS_EQUAL:
+      emitByte(OP_ADD);
+      break;
+    case TOKEN_MINUS_EQUAL:
+      emitByte(OP_SUBTRACT);
+      break;
+    case TOKEN_STAR_EQUAL:
+      emitByte(OP_MULTIPLY);
+      break;
+    case TOKEN_SLASH_EQUAL:
+      emitByte(OP_DIVIDE);
+      break;
+    default:
+      return;
+  }
 }
 
 static void namedVariable(Token name, bool canAssign) {
@@ -314,6 +401,15 @@ static void namedVariable(Token name, bool canAssign) {
 
   if (canAssign && match(TOKEN_EQUAL)) {
     expression();
+    emitBytes(setOp, (uint8_t)arg);
+  } else if (canAssign && isCompoundAssignment(parser.current.type)) {
+    TokenType operatorType = parser.current.type;
+    advance();
+
+    // `a += b` is compiled as `a = a + b`.
+    emitBytes(getOp, (uint8_t)arg);
+    expression();
+    emitCompoundOp(operatorType);
     emitBytes(setOp, (uint8_t)arg);
   } else {
     emitBytes(getOp, (uint8_t)arg);
@@ -380,6 +476,21 @@ static void printStatement() {
   emitByte(OP_PRINT);
 }
 
+static void whileStatement() {
+  int loopStart = currentChunk()->count;
+
+  // Go-style condition: no parentheses, the body's `{` ends the expression.
+  expression();
+
+  int exitJump = emitJump(OP_JUMP_IF_FALSE);
+  emitByte(OP_POP);
+  statement();
+  emitLoop(loopStart);
+
+  patchJump(exitJump);
+  emitByte(OP_POP);
+}
+
 static void synchronize() {
   parser.panicMode = false;
 
@@ -409,6 +520,89 @@ static void expressionStatement() {
   emitByte(OP_POP);
 }
 
+static void forStatement() {
+  beginScope();
+
+  // Go-style header: `for init; condition; post { ... }`. There are no
+  // parentheses, and the initializer declares the loop variable implicitly:
+  // `for i = 0; ...` instead of `for let i = 0; ...`.
+  if (match(TOKEN_SEMICOLON)) {
+    // No initializer.
+  } else {
+    match(TOKEN_LET);  // Optional; usually omitted in `for` headers.
+
+    uint8_t global = parseVariable("Expect variable name.");
+    if (match(TOKEN_EQUAL)) {
+      expression();
+    } else {
+      emitByte(OP_NIL);
+    }
+    consume(TOKEN_SEMICOLON, "Expect ';' after loop initializer.");
+    defineVariable(global);
+  }
+
+  // The header may be split across lines.
+  skipNewlines();
+
+  int loopStart = currentChunk()->count;
+  int exitJump = -1;
+  if (!match(TOKEN_SEMICOLON)) {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expect ';' after loop condition.");
+
+    // Jump out of the loop if the condition is false.
+    exitJump = emitJump(OP_JUMP_IF_FALSE);
+    emitByte(OP_POP);  // Condition.
+  }
+  skipNewlines();
+
+  // The post clause runs after the body but before the condition is checked
+  // again. Jump over it on the first pass through the loop.
+  if (!check(TOKEN_LEFT_BRACE)) {
+    int bodyJump = emitJump(OP_JUMP);
+    int incrementStart = currentChunk()->count;
+    expression();
+    emitByte(OP_POP);
+
+    emitLoop(loopStart);
+    loopStart = incrementStart;
+    patchJump(bodyJump);
+  }
+
+  skipNewlines();
+  statement();
+  emitLoop(loopStart);
+  if (exitJump != -1) {
+    patchJump(exitJump);
+    emitByte(OP_POP);  // Condition.
+  }
+
+  endScope();
+}
+
+static void ifStatement() {
+  // Go-style condition: no parentheses, the branch's `{` ends the expression.
+  expression();
+
+  int thenJump = emitJump(OP_JUMP_IF_FALSE);
+  emitByte(OP_POP);
+  statement();
+
+  // Allow `}` and `else` to sit on separate lines.
+  skipNewlines();
+
+  int elseJump = emitJump(OP_JUMP);
+
+  patchJump(thenJump);
+
+  if (match(TOKEN_ELSE)) {
+    skipNewlines();
+    statement();
+  }
+  emitByte(OP_POP);
+  patchJump(elseJump);
+}
+
 static void declaration() {
   // Skip blank lines (and any newline left over from a ';' statement).
   if (match(TOKEN_NEWLINE)) return;
@@ -427,6 +621,12 @@ static void declaration() {
 static void statement() {
   if (match(TOKEN_PRINT)) {
     printStatement();
+  } else if (match(TOKEN_IF)) {
+    ifStatement();
+  } else if (match(TOKEN_WHILE)) {
+    whileStatement();
+  } else if (match(TOKEN_FOR)) {
+    forStatement();
   } else if (match(TOKEN_LEFT_BRACE)) {
     beginScope();
     block();
@@ -511,8 +711,8 @@ ParseRule rules[] = {
     [TOKEN_NUMBER] = {number, NULL, PREC_NONE},        // number
 
     // Keywords.
-    [TOKEN_AND] = {NULL, NULL, PREC_NONE},       // and
-    [TOKEN_OR] = {NULL, NULL, PREC_NONE},        // or
+    [TOKEN_AND] = {NULL, and_, PREC_AND},        // and
+    [TOKEN_OR] = {NULL, or_, PREC_OR},           // or
     [TOKEN_NOT] = {NULL, NULL, PREC_NONE},       // not
     [TOKEN_NIL] = {literal, NULL, PREC_NONE},    // nil
     [TOKEN_IN] = {NULL, NULL, PREC_NONE},        // in

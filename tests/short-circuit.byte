@@ -1,0 +1,7 @@
+# The right-hand side must not be evaluated when it is short-circuited.
+print false and missing
+print true or missing
+
+# Both operators return one of their operands.
+print false or 42
+print true and 42

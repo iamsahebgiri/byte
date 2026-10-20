@@ -1,0 +1,11 @@
+let age = 20
+
+if age >= 21 {
+    print "elegible"
+} else {
+    print "ineligible"
+}
+
+if true {
+    print "i am true"
+}
