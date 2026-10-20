@@ -3,7 +3,6 @@
 
 #include <stdarg.h>
 
-#include "chunk.h"
 #include "common.h"
 #include "object.h"
 #include "scanner.h"
@@ -37,7 +36,13 @@ typedef struct {
 typedef struct {
   Token name;
   int depth;
+  bool isCaptured;
 } Local;
+
+typedef struct {
+  uint8_t index;
+  bool isLocal;
+} Upvalue;
 
 typedef enum { TYPE_FUNCTION, TYPE_SCRIPT } FunctionType;
 
@@ -48,6 +53,7 @@ typedef struct Compiler {
 
   Local locals[UINT8_COUNT];
   int localCount;
+  Upvalue upvalues[UINT8_COUNT];
   int scopeDepth;
 } Compiler;
 

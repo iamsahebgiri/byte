@@ -25,7 +25,8 @@ typedef struct {
   Value* stackTop;
   Table globals;  // global variables
   Table strings;  // pool for string interning
-  Obj* objects;   // head of linked list for heap values
+  ObjUpvalue* openUpvalues;
+  Obj* objects;  // head of linked list for heap values
 } VM;
 
 typedef enum {
