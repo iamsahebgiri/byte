@@ -1,6 +1,7 @@
 #ifndef BYTE_VM_H
 #define BYTE_VM_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "common.h"
@@ -27,6 +28,12 @@ typedef struct {
   Table strings;  // pool for string interning
   ObjUpvalue* openUpvalues;
   Obj* objects;  // head of linked list for heap values
+
+  size_t bytesAllocated;
+  size_t nextGC;
+  int grayCount;
+  int grayCapacity;
+  Obj** grayStack;
 } VM;
 
 typedef enum {

@@ -44,3 +44,4 @@ See the header of `tests/run.sh` for details.
 | [Architecture](docs/architecture.md)         | scanner → compiler → VM pipeline, Pratt expressions |
 | [Debugging](docs/debugging.md)               | disassembly and VM trace output      |
 | [Pratt parsing](docs/pratt-parsing.md)       | notes on how expression parsing works |
+| [Closures & upvalues](docs/closures.md)      | compile-time capture tables and runtime boxes |
