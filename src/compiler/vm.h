@@ -1,15 +1,26 @@
 #ifndef BYTE_VM_H
 #define BYTE_VM_H
 
-#include "core/chunk.h"
+#include <stdint.h>
+
+#include "common.h"
 #include "core/value.h"
+#include "object.h"
 #include "table.h"
 
-#define STACK_MAX 256
+#define FRAMES_MAX 64
+#define STACK_MAX (FRAMES_MAX * UINT8_COUNT)
 
 typedef struct {
-  Chunk* chunk;
+  ObjFunction* function;
   uint8_t* ip;
+  Value* slots;
+} CallFrame;
+
+typedef struct {
+  CallFrame frames[FRAMES_MAX];
+  int frameCount;
+
   Value stack[STACK_MAX];
   Value* stackTop;
   Table globals;  // global variables
