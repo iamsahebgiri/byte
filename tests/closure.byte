@@ -1,0 +1,8 @@
+func outer() {
+  let x = "outside"
+  func inner() {
+    print x
+  }
+  inner()
+}
+outer()
