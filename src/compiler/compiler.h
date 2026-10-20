@@ -4,17 +4,8 @@
 #include <stdarg.h>
 
 #include "chunk.h"
+#include "common.h"
 #include "scanner.h"
-
-typedef struct {
-  Scanner* scanner;
-
-  bool panicMode;
-  bool hadError;
-
-  Token current;
-  Token previous;
-} Parser;
 
 typedef enum {
   PREC_NONE,
@@ -34,13 +25,24 @@ typedef enum {
   PREC_PRIMARY
 } Precedence;
 
-typedef void (*ParseFn)(Parser*, bool canAssign);
+typedef void (*ParseFn)(bool canAssign);
 
 typedef struct {
   ParseFn prefix;
   ParseFn infix;
   Precedence precedence;
 } ParseRule;
+
+typedef struct {
+  Token name;
+  int depth;
+} Local;
+
+typedef struct {
+  Local locals[UINT8_COUNT];
+  int localCount;
+  int scopeDepth;
+} Compiler;
 
 bool compile(const char* source, Chunk* chunk);
 

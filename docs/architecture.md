@@ -37,6 +37,9 @@ in memory at run time.
 - Every statement is finished by the shared `terminator()` helper, which
   accepts `;`, a newline, or EOF as the end of the statement — blank lines
   are skipped by `declaration()`.
+- The whole parser (and its `Scanner`) is a single file-scope instance in
+  `src/compiler/compiler.c` — the compiler is single-pass and compiles one
+  source at a time, so internal functions take no `Parser*` argument.
 - Each statement compiles immediately into the current `Chunk`; there is no
   AST. Constants (numbers, strings, identifiers) are stored in the chunk's
   constant pool and referenced by index.

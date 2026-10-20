@@ -87,32 +87,36 @@ Two behaviors the ladder encodes:
 
 ## The engine
 
+The parser state is a file-scope singleton in `src/compiler/compiler.c`, so
+internal parse functions take no `Parser*` argument — they operate on the
+global `parser` (and the token "cursor" inside it):
+
 ```c
-static void parsePrecedence(Parser* parser, Precedence precedence) {
-  advance(parser);                          // previous = a real token
-  ParseFn prefixRule = getRule(parser->previous.type)->prefix;
+static void parsePrecedence(Precedence precedence) {
+  advance();                          // previous = a real token
+  ParseFn prefixRule = getRule(parser.previous.type)->prefix;
 
   if (prefixRule == NULL) {
-    errorAtCurrent(parser, "Expect expression.");
+    errorAtCurrent("Expect expression.");
     return;
   }
 
   bool canAssign = precedence <= PREC_ASSIGNMENT;
-  prefixRule(parser, canAssign);
+  prefixRule(canAssign);
 
-  while (precedence <= getRule(parser->current.type)->precedence) {
-    advance(parser);
-    ParseFn infixRule = getRule(parser->previous.type)->infix;
-    infixRule(parser, canAssign);
+  while (precedence <= getRule(parser.current.type)->precedence) {
+    advance();
+    ParseFn infixRule = getRule(parser.previous.type)->infix;
+    infixRule(canAssign);
   }
 
-  if (canAssign && match(parser, TOKEN_EQUAL)) {
-    error(parser, "Invalid assignment target.");
+  if (canAssign && match(TOKEN_EQUAL)) {
+    error("Invalid assignment target.");
   }
 }
 
-static void expression(Parser* parser) {
-  parsePrecedence(parser, PREC_ASSIGNMENT); // loosest tier = full expression
+static void expression() {
+  parsePrecedence(PREC_ASSIGNMENT);   // loosest tier = full expression
 }
 ```
 
@@ -157,13 +161,13 @@ unwind, because every precedence level is the _same_ function.
 instead:
 
 ```c
-static void namedVariable(Parser* parser, Token name, bool canAssign) {
-  uint8_t arg = identifierConstant(parser, &name);
-  if (canAssign && match(parser, TOKEN_EQUAL)) {
-    expression(parser);                      // right-hand side
-    emitBytes(parser, OP_SET_GLOBAL, arg);
+static void namedVariable(Token name, bool canAssign) {
+  uint8_t arg = identifierConstant(&name);
+  if (canAssign && match(TOKEN_EQUAL)) {
+    expression();                            // right-hand side
+    emitBytes(OP_SET_GLOBAL, arg);
   } else {
-    emitBytes(parser, OP_GET_GLOBAL, arg);
+    emitBytes(OP_GET_GLOBAL, arg);
   }
 }
 ```
