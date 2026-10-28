@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Playground from '../components/Playground.astro';
+---
+
+<Base
+  title="Byte playground"
+  description="Write and run Byte programs in the browser. The interpreter is compiled to WebAssembly."
+>
+  <Masthead />
+  <Playground />
+  <footer class="foot">
+    <span class="foot-hints">
+      <span><kbd id="shortcut-hint">⌘↵</kbd> run</span>
+      <span><kbd>Tab</kbd> indent</span>
+    </span>
+    <span class="foot-note">nothing leaves your browser</span>
+  </footer>
+</Base>

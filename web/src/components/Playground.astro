@@ -1,0 +1,61 @@
+<main class="workspace">
+    <section class="panel">
+        <div class="panel-head">
+            <span class="panel-title">program</span>
+            <div class="actions">
+                <label class="select-wrap">
+                    <span class="sr-only">Load an example</span>
+                    <select id="examples">
+                        <option value="">Examples…</option>
+                    </select>
+                </label>
+                <button id="run" class="run" type="button">
+                    <svg
+                        class="run-icon"
+                        viewBox="0 0 12 12"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M3.2 1.7v8.6L10.2 6 3.2 1.7Z"
+                            fill="currentColor"
+                        />
+                    </svg>
+                    Run
+                    <kbd id="shortcut">⌘↵</kbd>
+                </button>
+            </div>
+        </div>
+
+        <div class="editor">
+            <div id="gutter" class="gutter" aria-hidden="true"></div>
+            <textarea
+                id="editor"
+                spellcheck="false"
+                autocomplete="off"
+                autocapitalize="off"
+                autocorrect="off"
+                wrap="off"
+                aria-label="Byte program source"
+            ></textarea>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <span class="panel-title">output</span>
+            <div class="actions">
+                <span id="status" class="status" role="status">
+                    ready
+                </span>
+                <button id="clear" class="ghost" type="button">
+                    Clear
+                </button>
+            </div>
+        </div>
+        <div id="output" class="output" aria-live="polite"></div>
+    </section>
+</main>
+
+<script>
+    import "../scripts/playground.js";
+</script>

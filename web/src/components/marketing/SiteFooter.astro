@@ -1,0 +1,89 @@
+---
+import BrandMark from './BrandMark.astro';
+import Icon from './Icon.astro';
+
+const year = new Date().getFullYear();
+const repo = 'https://github.com/iamsahebgiri/byte';
+
+const columns = [
+  {
+    title: 'Language',
+    links: [
+      {
+        label: 'Language guide',
+        href: `${repo}/blob/main/docs/language.md`,
+        external: true,
+      },
+      {
+        label: 'Architecture',
+        href: `${repo}/blob/main/docs/architecture.md`,
+        external: true,
+      },
+      {
+        label: 'Debugging',
+        href: `${repo}/blob/main/docs/debugging.md`,
+        external: true,
+      },
+      {
+        label: 'Closures',
+        href: `${repo}/blob/main/docs/closures.md`,
+        external: true,
+      },
+    ],
+  },
+  {
+    title: 'Project',
+    links: [
+      { label: 'Source', href: repo, external: true },
+      { label: 'Issues', href: `${repo}/issues`, external: true },
+      { label: 'Test suite', href: `${repo}/tree/main/tests`, external: true },
+      { label: 'README', href: `${repo}/blob/main/README.md`, external: true },
+    ],
+  },
+];
+---
+
+<footer class="site-foot">
+  <div class="shell foot-grid">
+    <div class="foot-brand">
+      <a class="foot-logo" href="/" aria-label="Byte home">
+        <BrandMark size={36} />
+      </a>
+      <p class="foot-word">byte<span>.</span></p>
+      <p class="foot-line">
+        A small language, built in C and compiled to WebAssembly.
+      </p>
+    </div>
+
+    {
+      columns.map((column) => (
+        <div class="foot-col">
+          <p class="foot-head">{column.title}</p>
+          {column.links.map((link) => (
+            <a
+              href={link.href}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noreferrer' : undefined}
+            >
+              {link.label}
+              {link.external && <Icon name="arrow-up-right" size={12} />}
+            </a>
+          ))}
+        </div>
+      ))
+    }
+
+    <div class="foot-col">
+      <p class="foot-head">This site</p>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/playground/">Playground</a>
+    </div>
+  </div>
+
+  <div class="shell foot-bottom">
+    <p>© {year} Byte</p>
+    <p>No cookies. No analytics. No tracking.</p>
+    <p class="foot-note">Built with C and WebAssembly.</p>
+  </div>
+</footer>

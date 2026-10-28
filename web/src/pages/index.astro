@@ -1,0 +1,563 @@
+---
+import Icon from "../components/marketing/Icon.astro";
+import MarketingLayout from "../layouts/MarketingLayout.astro";
+
+const repo = "https://github.com/iamsahebgiri/byte";
+
+const benefits = [
+    {
+        icon: "book-open",
+        title: "Read the whole thing",
+        copy: "The scanner, compiler and VM are small enough to follow in one sitting. There is no parser generator and no hidden runtime.",
+    },
+    {
+        icon: "function",
+        title: "Real language features",
+        copy: "Functions, recursion, closures, strings and compound assignment. The surface is small, but the programs are real.",
+    },
+    {
+        icon: "browsers",
+        title: "Runs in the browser",
+        copy: "The interpreter builds to WebAssembly. The playground runs actual bytecode in a worker, with no server round trip.",
+    },
+    {
+        icon: "bug",
+        title: "Built to be inspected",
+        copy: "One CMake flag turns on disassembly and a stack trace for every instruction. Errors report the line they came from.",
+    },
+];
+
+const steps = [
+    {
+        number: "01",
+        title: "Scan",
+        copy: "The scanner turns characters into tokens and tracks line numbers. Comments and blank lines fall away.",
+        from: "source",
+        to: "tokens",
+    },
+    {
+        number: "02",
+        title: "Compile",
+        copy: "A recursive descent parser handles statements. Pratt parsing handles expressions. Bytecode goes straight into a chunk, with no AST in between.",
+        from: "tokens",
+        to: "bytecode",
+    },
+    {
+        number: "03",
+        title: "Run",
+        copy: "The stack VM walks the chunk one opcode at a time. Turn on trace mode to see the value stack after every instruction.",
+        from: "bytecode",
+        to: "values",
+    },
+];
+
+const docs = [
+    {
+        label: "Closures",
+        title: "Upvalues and capture",
+        copy: "How compile time capture tables become runtime boxes, and why the compiler needs both.",
+        href: `${repo}/blob/main/docs/closures.md`,
+    },
+    {
+        label: "Parsing",
+        title: "Pratt parsing",
+        copy: "Binding power, prefix and infix rules, and the canAssign flag that keeps assignment honest.",
+        href: `${repo}/blob/main/docs/pratt-parsing.md`,
+    },
+    {
+        label: "Debugging",
+        title: "Disassembly and trace",
+        copy: "One CMake flag prints every opcode and the value stack beside it. Snapshots stay clean because it is off by default.",
+        href: `${repo}/blob/main/docs/debugging.md`,
+    },
+    {
+        label: "Architecture",
+        title: "Scanner to VM",
+        copy: "The pipeline in one page: source, tokens, chunk and the dispatch loop that runs it.",
+        href: `${repo}/blob/main/docs/architecture.md`,
+    },
+];
+
+const faqs = [
+    {
+        q: "What is Byte?",
+        a: "Byte is a small programming language with a compiler and a stack virtual machine, both written in C. It started as a way to learn how languages work end to end, and it has grown into a complete little language.",
+    },
+    {
+        q: "Is Byte ready for production?",
+        a: "No. Byte is an experimental language and a learning project. There is no package manager, no standard library beyond print and clock, and no stability promise. Use it to learn, teach or experiment, not for anything important.",
+    },
+    {
+        q: "What can I write with it?",
+        a: "Variables, arithmetic, strings, conditionals, loops, functions, recursion and closures. There are no arrays, maps, classes, modules or exceptions yet.",
+    },
+    {
+        q: "How does the playground work?",
+        a: "The interpreter is compiled to WebAssembly with Emscripten and runs inside a Web Worker in your browser. Each run starts from a clean VM, and a program that runs longer than five seconds is stopped.",
+    },
+    {
+        q: "Does my code leave the browser?",
+        a: "No. The playground is a static site. Your source is passed to the WebAssembly module in your tab and is never uploaded. The site has no analytics and sets no cookies.",
+    },
+    {
+        q: "Can I run Byte outside the browser?",
+        a: "Yes. Clone the repository, configure it with CMake and build the byte executable. You need a C11 compiler. Emscripten is only needed for the browser build.",
+    },
+    {
+        q: "Can I embed the interpreter in my own project?",
+        a: "There is no stable embedding API yet, but the source is public and builds with CMake. web/byte_web.c shows the smallest integration point: reset the VM, pass a source string to byte_run and forward the output.",
+    },
+    {
+        q: "Why does the language exist?",
+        a: "It is a compact, complete example of a compiler and a virtual machine. The goal is not to replace your favorite language. The goal is a codebase you can read in one sitting and change without fear.",
+    },
+    {
+        q: "What should I read first?",
+        a: "Start with the language guide, then the architecture note. If closures or Pratt parsing are unfamiliar, those notes go deeper. The debugging note shows how to print disassembly and a stack trace.",
+    },
+    {
+        q: "Is there a license?",
+        a: "The repository does not include a license file yet, so no reuse rights are granted by default. If you want to use the code, open an issue and ask.",
+    },
+];
+
+const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.a,
+        },
+    })),
+};
+
+const taglineLines = [
+    ["Source", "in.", "Bytecode", "out."],
+    ["Every", "step", "small", "enough", "to", "follow."],
+];
+---
+
+<MarketingLayout
+    title="Byte, a programming language you can read end to end"
+    description="Byte is a small programming language with a C compiler, a stack VM and a WebAssembly playground. Read the source, run a program or dig into the pipeline."
+>
+    <Fragment slot="head">
+        <script
+            type="application/ld+json"
+            set:html={JSON.stringify(faqSchema)}
+        />
+    </Fragment>
+
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="shell hero-grid">
+            <div class="hero-copy">
+                <p class="eyebrow">
+                    <span class="eyebrow-dot" aria-hidden="true"></span>A small
+                    language, built in C
+                </p>
+
+                <h1 class="hero-title" id="hero-title">
+                    <span class="hero-title-line">A programming</span>{" "}
+                    <span class="hero-title-line">language you can</span>{" "}
+                    <span class="hero-title-line">read end to end.</span>
+                </h1>
+
+                <p class="hero-sub">
+                    Byte compiles source to bytecode in a single pass, then runs
+                    it on a small stack VM. The whole interpreter is 2,334 lines
+                    of C, and it runs in your browser through WebAssembly.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="/playground/">
+                        Open playground
+                        <Icon name="arrow-right" size={18} />
+                    </a>
+                    <a
+                        class="text-link"
+                        href={`${repo}/blob/main/docs/language.md`}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Read the language guide
+                        <Icon name="arrow-up-right" size={16} />
+                    </a>
+                </div>
+
+                <p class="hero-proof">
+                    <Icon name="check" size={16} />
+                    No install. No account. Code stays in your tab.
+                </p>
+            </div>
+
+            <figure
+                class="code-window"
+                data-reveal
+                aria-labelledby="hero-code-caption"
+            >
+                <figcaption id="hero-code-caption" class="sr-only">
+                    A Byte program that prints the first five Fibonacci numbers,
+                    and the output it produces.
+                </figcaption>
+
+                <div class="code-head">
+                    <span class="code-file">
+                        <Icon name="terminal-window" size={16} />
+                        fib.byte
+                    </span>
+                    <button
+                        class="copy-btn"
+                        type="button"
+                        data-copy="hero-code"
+                        data-label="Copy"
+                        data-done="Copied"
+                        data-failed="Copy failed"
+                    >
+                        <Icon name="copy" size={14} class="copy-icon-default" />
+                        <Icon name="check" size={14} class="copy-icon-done" />
+                        <Icon name="x" size={14} class="copy-icon-failed" />
+                        <span class="copy-label" aria-live="polite">
+                            Copy
+                        </span>
+                    </button>
+                </div>
+
+                <pre
+                    class="code-body"
+                    id="hero-code"
+                ><code><span class="tok-keyword">func</span> <span class="tok-function">fib</span>(n) &#123;
+  <span class="tok-keyword">if</span> n &lt; <span class="tok-number">2</span> &#123; <span class="tok-keyword">return</span> n &#125;
+  <span class="tok-keyword">return</span> <span class="tok-function">fib</span>(n - <span class="tok-number">1</span>) + <span class="tok-function">fib</span>(n - <span class="tok-number">2</span>)
+&#125;
+
+<span class="tok-keyword">for</span> i = <span class="tok-number">0</span>; i &lt; <span class="tok-number">5</span>; i += <span class="tok-number">1</span> &#123;
+  <span class="tok-keyword">print</span> <span class="tok-function">fib</span>(i)
+&#125;
+</code></pre>
+
+                <div class="code-output">
+                    <div class="code-output-head">
+                        <span>output</span>
+                        <span class="code-exit">exit 0</span>
+                    </div>
+                    <pre>0
+1
+1
+2
+3</pre>
+                </div>
+            </figure>
+        </div>
+    </section>
+
+    <section class="stats" aria-label="Byte at a glance">
+        <div class="shell">
+            <div class="stats-panel" data-reveal>
+                <div>
+                    <span class="stat-num">2,334</span>
+                    <span class="stat-label">
+                        lines of C, from scanner to VM
+                    </span>
+                </div>
+                <div>
+                    <span class="stat-num">16</span>
+                    <span class="stat-label">
+                        test programs with golden snapshots
+                    </span>
+                </div>
+                <div>
+                    <span class="stat-num">3</span>
+                    <span class="stat-label">stages in the pipeline</span>
+                </div>
+                <div>
+                    <span class="stat-num">5</span>
+                    <span class="stat-label">notes on the internals</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-lined" id="why">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <p class="section-kicker">Why Byte</p>
+                <h2 class="section-title">Small surface. Real programs.</h2>
+                <p class="section-sub">
+                    Byte is not a syntax sketch with a fake backend. It scans,
+                    compiles and executes, and every stage is small enough to
+                    open and read.
+                </p>
+            </div>
+
+            <div class="cards">
+                {benefits.map((benefit, index) => (
+                    <article
+                        class="card"
+                        data-reveal
+                        style={`--d:${index * 80}ms`}
+                    >
+                        <Icon name={benefit.icon} size={24} class="card-icon" />
+                        <h3 class="card-title">{benefit.title}</h3>
+                        <p class="card-copy">{benefit.copy}</p>
+                    </article>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="tagline-section" aria-labelledby="tagline-title">
+        <div class="shell">
+            <p class="section-kicker" data-reveal>
+                The idea
+            </p>
+            <h2 class="tagline" id="tagline-title" data-tagline>
+                {taglineLines.map((line) => (
+                    <span class="tagline-line">
+                        {line.map((word, index) => (
+                            <Fragment>
+                                {index > 0 && " "}
+                                <span class="tagline-word">{word}</span>
+                            </Fragment>
+                        ))}
+                    </span>
+                ))}
+            </h2>
+        </div>
+    </section>
+
+    <section class="section section-lined" id="language">
+        <div class="shell split-grid">
+            <div class="split-copy" data-reveal>
+                <p class="section-kicker">The language</p>
+                <h2 class="section-title">Enough language to do something.</h2>
+                <p class="section-sub">
+                    No package manager. No framework. Just the parts a language
+                    needs to run a program, plus closures to make them
+                    interesting.
+                </p>
+
+                <ul class="feature-list">
+                    <li>Functions, recursion and closures with upvalues</li>
+                    <li>Strings, arithmetic and compound assignment</li>
+                    <li>if, while and for with brace bodies</li>
+                    <li>A native clock function for timing</li>
+                </ul>
+
+                <a class="text-link" href="/playground/?example=closure">
+                    Try the closure example
+                    <Icon name="arrow-right" size={16} />
+                </a>
+            </div>
+
+            <figure
+                class="code-window code-window-small"
+                data-reveal
+                style="--d:120ms"
+                aria-labelledby="closure-code-caption"
+            >
+                <figcaption id="closure-code-caption" class="sr-only">
+                    A Byte program that builds a counter with a closure, and the
+                    output it produces.
+                </figcaption>
+
+                <div class="code-head">
+                    <span class="code-file">
+                        <Icon name="terminal-window" size={16} />
+                        counter.byte
+                    </span>
+                    <button
+                        class="copy-btn"
+                        type="button"
+                        data-copy="closure-code"
+                        data-label="Copy"
+                        data-done="Copied"
+                        data-failed="Copy failed"
+                    >
+                        <Icon name="copy" size={14} class="copy-icon-default" />
+                        <Icon name="check" size={14} class="copy-icon-done" />
+                        <Icon name="x" size={14} class="copy-icon-failed" />
+                        <span class="copy-label" aria-live="polite">
+                            Copy
+                        </span>
+                    </button>
+                </div>
+
+                <pre
+                    class="code-body"
+                    id="closure-code"
+                ><code><span class="tok-keyword">func</span> <span class="tok-function">counter</span>() &#123;
+  <span class="tok-keyword">let</span> count = <span class="tok-number">0</span>
+
+  <span class="tok-keyword">func</span> <span class="tok-function">increment</span>() &#123;
+    count += <span class="tok-number">1</span>
+    <span class="tok-keyword">return</span> count
+  &#125;
+
+  <span class="tok-keyword">return</span> increment
+&#125;
+
+<span class="tok-keyword">let</span> next = <span class="tok-function">counter</span>()
+<span class="tok-keyword">print</span> <span class="tok-function">next</span>()
+<span class="tok-keyword">print</span> <span class="tok-function">next</span>()
+<span class="tok-keyword">print</span> <span class="tok-function">next</span>()
+</code></pre>
+
+                <div class="code-output">
+                    <div class="code-output-head">
+                        <span>output</span>
+                        <span class="code-exit">exit 0</span>
+                    </div>
+                    <pre>1
+2
+3</pre>
+                </div>
+            </figure>
+        </div>
+    </section>
+
+    <section class="section section-lined" id="pipeline">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <p class="section-kicker">The pipeline</p>
+                <h2 class="section-title">From text to a running stack.</h2>
+                <p class="section-sub">
+                    Three stages, one direction. Each stage is a file you can
+                    open and read.
+                </p>
+            </div>
+
+            <ol class="pipeline">
+                {steps.map((step, index) => (
+                    <li
+                        class="pipeline-step"
+                        data-reveal
+                        style={`--d:${index * 80}ms`}
+                    >
+                        <span class="step-num">{step.number}</span>
+                        <h3 class="step-title">{step.title}</h3>
+                        <p class="step-copy">{step.copy}</p>
+                        <div class="step-flow" aria-hidden="true">
+                            <span>{step.from}</span>
+                            <Icon name="arrow-right" size={12} />
+                            <span>{step.to}</span>
+                        </div>
+                    </li>
+                ))}
+            </ol>
+
+            <div class="pipeline-note" data-reveal>
+                <Icon name="stack" size={20} />
+                <p>
+                    <strong>One pass, no AST.</strong> The compiler writes
+                    bytecode as it parses, and the VM executes that chunk on an
+                    expression stack. The whole path is source, tokens, bytecode
+                    and values.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-lined" id="docs">
+        <div class="shell">
+            <div class="section-head" data-reveal>
+                <p class="section-kicker">Docs</p>
+                <h2 class="section-title">The hard parts are written down.</h2>
+                <p class="section-sub">
+                    Closures, Pratt parsing and the debug trace each have a
+                    short note that explains the mechanism and the tradeoffs.
+                </p>
+            </div>
+
+            <div class="docs-grid">
+                {docs.map((doc, index) => (
+                    <a
+                        class="doc-card"
+                        href={doc.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        data-reveal
+                        style={`--d:${index * 80}ms`}
+                    >
+                        <span class="doc-top">
+                            <span class="doc-label">{doc.label}</span>
+                            <Icon
+                                name="arrow-up-right"
+                                size={20}
+                                class="doc-arrow"
+                            />
+                        </span>
+                        <span class="doc-title">{doc.title}</span>
+                        <span class="doc-copy">{doc.copy}</span>
+                    </a>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-lined" id="faq">
+        <div class="shell faq-grid">
+            <div class="faq-intro" data-reveal>
+                <p class="section-kicker">Questions</p>
+                <h2 class="section-title">Before you open the playground.</h2>
+                <p class="section-sub">
+                    The short answers. The docs have the long ones.
+                </p>
+                <a
+                    class="text-link"
+                    href={`${repo}/blob/main/docs/language.md`}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    Read the language guide
+                    <Icon name="arrow-up-right" size={16} />
+                </a>
+            </div>
+
+            <div class="faq-list" data-reveal>
+                {faqs.map((faq) => (
+                    <details class="faq-item">
+                        <summary>
+                            <span>{faq.q}</span>
+                            <span class="faq-icon" aria-hidden="true">
+                                <Icon name="plus" size={18} class="faq-plus" />
+                                <Icon
+                                    name="minus"
+                                    size={18}
+                                    class="faq-minus"
+                                />
+                            </span>
+                        </summary>
+                        <div class="faq-answer">
+                            <p>{faq.a}</p>
+                        </div>
+                    </details>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="final">
+        <div class="shell">
+            <div class="final-card" data-reveal>
+                <p class="section-kicker">Try it</p>
+                <h2 class="section-title">Write a program. Watch it run.</h2>
+                <p class="final-copy">
+                    The playground compiles your source to bytecode in the
+                    browser and stops runaway loops after five seconds.
+                </p>
+                <div class="final-actions">
+                    <a class="btn btn-primary" href="/playground/">
+                        Open playground
+                        <Icon name="arrow-right" size={18} />
+                    </a>
+                </div>
+                <p class="final-note">
+                    No install. No account. Nothing leaves your tab.
+                </p>
+            </div>
+        </div>
+    </section>
+</MarketingLayout>

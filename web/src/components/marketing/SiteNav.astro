@@ -1,0 +1,119 @@
+---
+import BrandMark from "./BrandMark.astro";
+import Icon from "./Icon.astro";
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isHome = path === "/";
+
+const menu = [
+    { label: "Language", href: "/#language" },
+    { label: "Pipeline", href: "/#pipeline" },
+    { label: "FAQ", href: "/#faq" },
+    {
+        label: "Language guide",
+        href: "https://github.com/iamsahebgiri/byte/blob/main/docs/language.md",
+        external: true,
+    },
+];
+
+const repo = "https://github.com/iamsahebgiri/byte";
+---
+
+<header class="site-head">
+    <nav class="nav-pill" aria-label="Main">
+        <a
+            class="brand"
+            href="/"
+            aria-label="Byte home"
+            aria-current={isHome ? "page" : undefined}
+        >
+            <BrandMark size={32} class="brand-mark" />
+            <span class="brand-word">
+                byte<span class="brand-dot">.</span>
+            </span>
+        </a>
+
+        <span class="nav-spacer" aria-hidden="true"></span>
+
+        <div class="nav-links">
+            <a class="nav-link" href="/#language">
+                Language
+            </a>
+            <a class="nav-link" href="/#pipeline">
+                Pipeline
+            </a>
+            <a class="nav-link" href="/#faq">
+                FAQ
+            </a>
+            <a
+                class="nav-link nav-link-icon"
+                href={repo}
+                target="_blank"
+                rel="noreferrer"
+            >
+                Github
+            </a>
+        </div>
+
+        <div class="nav-actions">
+            <a class="nav-cta" href="/playground/">
+                Open playground
+                <Icon name="arrow-right" size={16} />
+            </a>
+            <button
+                id="menu-toggle"
+                class="menu-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="site-menu"
+                aria-label="Open menu"
+            >
+                <span class="menu-bars" aria-hidden="true">
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                </span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="site-menu" class="menu" aria-hidden="true">
+        <div class="menu-inner">
+            <p class="menu-kicker">Menu</p>
+            <nav class="menu-nav" aria-label="Menu">
+                {menu.map((item, index) => (
+                    <a
+                        class="menu-link"
+                        href={item.href}
+                        style={`--i:${index}`}
+                        target={item.external ? "_blank" : undefined}
+                        rel={item.external ? "noreferrer" : undefined}
+                    >
+                        <span>{item.label}</span>
+                        <Icon
+                            name={
+                                item.external ? "arrow-up-right" : "arrow-right"
+                            }
+                            size={20}
+                        />
+                    </a>
+                ))}
+            </nav>
+            <div class="menu-foot" style="--i:4">
+                <a class="btn btn-primary menu-cta" href="/playground/">
+                    Open playground
+                    <Icon name="arrow-right" size={16} />
+                </a>
+                <a
+                    class="menu-source"
+                    href={repo}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    <Icon name="github-logo" size={18} />
+                    Source on GitHub
+                    <Icon name="arrow-up-right" size={14} />
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

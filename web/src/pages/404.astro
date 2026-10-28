@@ -1,0 +1,35 @@
+---
+import Icon from '../components/marketing/Icon.astro';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout
+  title="Page not found, Byte"
+  description="This page is not in the chunk. Head back to the overview or open the playground."
+  noindex
+>
+  <section class="not-found" aria-labelledby="not-found-title">
+    <div class="shell">
+      <div class="prose">
+        <p class="not-found-code" aria-hidden="true">404</p>
+        <h1 class="section-title" id="not-found-title">
+          This page is not in the chunk.
+        </h1>
+        <p class="section-sub">
+          The path may be wrong, or the page may have moved. The overview and
+          the playground are both still here.
+        </p>
+        <div class="not-found-actions">
+          <a class="btn btn-primary" href="/">
+            Back to overview
+            <Icon name="arrow-right" size={18} />
+          </a>
+          <a class="text-link" href="/playground/">
+            Open playground
+            <Icon name="arrow-right" size={16} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</MarketingLayout>

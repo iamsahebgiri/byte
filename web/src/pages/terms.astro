@@ -1,0 +1,51 @@
+---
+import Icon from '../components/marketing/Icon.astro';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout
+  title="Terms, Byte"
+  description="The terms for using the Byte site and playground."
+>
+  <section class="prose-page">
+    <div class="shell prose">
+      <p class="section-kicker">Terms</p>
+      <h1 class="section-title">An experiment, offered as is.</h1>
+      <p class="updated">Last updated October 25, 2026</p>
+
+      <p>
+        Byte is an experimental language and a learning project. It is provided
+        as is, without warranties of any kind.
+      </p>
+
+      <p>
+        The playground may stop, reset or produce incorrect results. Do not use
+        it for anything important.
+      </p>
+
+      <h2>Running code</h2>
+      <p>
+        Programs run in a WebAssembly worker and are stopped after five seconds.
+        That limit is a courtesy, not a security guarantee. Do not run code you
+        do not trust.
+      </p>
+
+      <h2>Reuse</h2>
+      <p>
+        The source is on{' '}
+        <a
+          href="https://github.com/iamsahebgiri/byte"
+          target="_blank"
+          rel="noreferrer">GitHub</a>. The repository does not include a license
+        file, so no reuse rights are granted by default.
+      </p>
+
+      <p>These terms may change as the project changes.</p>
+
+      <a class="text-link" href="/">
+        Back to overview
+        <Icon name="arrow-right" size={16} />
+      </a>
+    </div>
+  </section>
+</MarketingLayout>

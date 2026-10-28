@@ -1,0 +1,51 @@
+---
+import Icon from '../components/marketing/Icon.astro';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+---
+
+<MarketingLayout
+  title="Privacy, Byte"
+  description="How the Byte site and playground handle your data. Short version: nothing leaves your browser."
+>
+  <section class="prose-page">
+    <div class="shell prose">
+      <p class="section-kicker">Privacy</p>
+      <h1 class="section-title">Your code stays in the tab.</h1>
+      <p class="updated">Last updated October 25, 2026</p>
+
+      <p>
+        The Byte playground runs entirely in your browser. The interpreter is
+        compiled to WebAssembly and loaded as a static file. The code you write
+        is never sent to a server.
+      </p>
+
+      <p>
+        This site does not use analytics, advertising, cookies or third party
+        scripts. The only network requests are for the page, its fonts and the
+        WebAssembly module.
+      </p>
+
+      <h2>Links to other sites</h2>
+      <p>
+        The site links to GitHub for source code, documentation and issues. If
+        you follow one of those links, GitHub's privacy policy applies to that
+        site.
+      </p>
+
+      <h2>Questions</h2>
+      <p>
+        Open an issue on{' '}
+        <a
+          href="https://github.com/iamsahebgiri/byte/issues"
+          target="_blank"
+          rel="noreferrer">GitHub</a>{' '}
+        if anything here is unclear.
+      </p>
+
+      <a class="text-link" href="/">
+        Back to overview
+        <Icon name="arrow-right" size={16} />
+      </a>
+    </div>
+  </section>
+</MarketingLayout>

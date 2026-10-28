@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect width="1200" height="630" fill="#000000"/>
+<g transform="translate(72 64) scale(0.0625)">
+<rect x="62" y="62" width="900" height="900" fill="#7ee787"/>
+<path d="M437.184 862.712V792.056H280V725.496L424.896 499.192H519.616V721.912H562.624V792.056H519.616V862.712H437.184ZM356.288 721.912H437.184V600.568L356.288 721.912Z" fill="black"/>
+<path d="M596.216 862.712C596.216 831.992 599.971 805.197 607.48 782.328C615.331 759.459 628.643 738.808 647.416 720.376C666.189 701.944 691.96 684.365 724.728 667.64C735.651 661.837 744.867 656.205 752.376 650.744C759.885 645.283 765.688 638.968 769.784 631.8C773.88 624.632 775.928 615.587 775.928 604.664C775.928 596.131 774.221 588.792 770.808 582.648C767.736 576.163 763.128 571.213 756.984 567.8C750.84 564.387 743.16 562.68 733.944 562.68C717.901 562.68 706.125 567.459 698.616 577.016C691.107 586.232 685.816 599.715 682.744 617.464L597.24 612.856C600.995 574.968 614.307 545.272 637.176 523.768C660.387 501.923 693.325 491 735.992 491C763.64 491 786.68 495.608 805.112 504.824C823.544 513.699 837.368 526.328 846.584 542.712C855.8 558.755 860.408 577.699 860.408 599.544C860.408 619.341 857.336 636.408 851.192 650.744C845.048 664.739 834.979 677.709 820.984 689.656C807.331 701.261 788.728 713.549 765.176 726.52C746.061 736.76 731.043 745.805 720.12 753.656C709.539 761.165 701.859 767.821 697.08 773.624C692.643 779.085 690.083 784.376 689.4 789.496H860.408V862.712H596.216Z" fill="black"/>
+</g>
+<text x="152" y="106" font-family="Geist Mono" font-size="38" font-weight="600" fill="#f5f5f5">BYTE<tspan fill="#7ee787">.</tspan></text>
+<text x="1128" y="100" text-anchor="end" font-family="Geist Mono" font-size="20" xml:space="preserve"><tspan fill="#7ee787">//</tspan><tspan fill="#8a8a8a"> my first programming language, by one person</tspan></text>
+<text x="72" y="258" font-family="Geist Mono" font-size="44" font-weight="600" fill="#f5f5f5">I built my first</text>
+<text x="72" y="312" font-family="Geist Mono" font-size="44" font-weight="600" fill="#f5f5f5">programming language</text>
+<text x="72" y="366" font-family="Geist Mono" font-size="44" font-weight="600" fill="#f5f5f5">in C, from scratch.</text>
+<text x="72" y="424" font-family="Geist Mono" font-size="22" fill="#a3a3a3">a scanner, a compiler and a stack VM,</text>
+<text x="72" y="456" font-family="Geist Mono" font-size="22" xml:space="preserve"><tspan fill="#a3a3a3"></tspan><tspan fill="#7ee787">2,334</tspan><tspan fill="#a3a3a3"> lines of C, running in your browser.</tspan></text>
+<rect x="72" y="560" width="1056" height="1" fill="#272727"/>
+<text x="72" y="596" font-family="Geist Mono" font-size="19" fill="#8a8a8a">github.com/iamsahebgiri/byte</text>
+<text x="1128" y="596" text-anchor="end" font-family="Geist Mono" font-size="19" xml:space="preserve"><tspan fill="#7ee787">2,334</tspan><tspan fill="#8a8a8a"> lines of C  ·  </tspan><tspan fill="#7ee787">16</tspan><tspan fill="#8a8a8a"> test programs</tspan></text>
+<rect x="652" y="142" width="472" height="396" fill="#272727"/>
+<rect x="642" y="132" width="472" height="396" fill="#181818" stroke="#313131" stroke-width="2"/>
+<rect x="642" y="132" width="472" height="44" fill="#1f1f1f"/>
+<rect x="642" y="176" width="472" height="1" fill="#272727"/>
+<text x="664" y="160" font-family="Geist Mono" font-size="14" fill="#a3a3a3">fib.byte</text>
+<text x="1092" y="160" text-anchor="end" font-family="Geist Mono" font-size="14" fill="#7ee787">exit 0</text>
+<text x="664" y="204.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#7ee787">func </tspan><tspan fill="#d2a8ff">fib</tspan><tspan fill="#e5e5e5">(n) {</tspan></text>
+<text x="664" y="224.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#e5e5e5">  </tspan><tspan fill="#7ee787">if</tspan><tspan fill="#e5e5e5"> n </tspan><tspan fill="#e5e5e5">&lt;</tspan><tspan fill="#e5e5e5"> </tspan><tspan fill="#f0c674">2</tspan><tspan fill="#e5e5e5"> { </tspan><tspan fill="#7ee787">return</tspan><tspan fill="#e5e5e5"> n }</tspan></text>
+<text x="664" y="244.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#e5e5e5">  </tspan><tspan fill="#7ee787">return</tspan><tspan fill="#e5e5e5"> </tspan><tspan fill="#d2a8ff">fib</tspan><tspan fill="#e5e5e5">(n - </tspan><tspan fill="#f0c674">1</tspan><tspan fill="#e5e5e5">)</tspan></text>
+<text x="664" y="264.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#e5e5e5">    + </tspan><tspan fill="#d2a8ff">fib</tspan><tspan fill="#e5e5e5">(n - </tspan><tspan fill="#f0c674">2</tspan><tspan fill="#e5e5e5">)</tspan></text>
+<text x="664" y="284.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#e5e5e5">}</tspan></text>
+<text x="664" y="304.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"></text>
+<text x="664" y="324.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#7ee787">for</tspan><tspan fill="#e5e5e5"> i = </tspan><tspan fill="#f0c674">0</tspan><tspan fill="#e5e5e5">; i </tspan><tspan fill="#e5e5e5">&lt;</tspan><tspan fill="#e5e5e5"> </tspan><tspan fill="#f0c674">5</tspan><tspan fill="#e5e5e5">; i += </tspan><tspan fill="#f0c674">1</tspan><tspan fill="#e5e5e5"> {</tspan></text>
+<text x="664" y="344.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#e5e5e5">  </tspan><tspan fill="#7ee787">print</tspan><tspan fill="#e5e5e5"> </tspan><tspan fill="#d2a8ff">fib</tspan><tspan fill="#e5e5e5">(i)</tspan></text>
+<text x="664" y="364.0" font-family="Geist Mono" font-size="13.5" xml:space="preserve"><tspan fill="#e5e5e5">}</tspan></text>
+<rect x="642" y="378.0" width="472" height="1" fill="#272727"/>
+<text x="664" y="410.0" font-family="Geist Mono" font-size="12" letter-spacing="2" fill="#8a8a8a">OUTPUT</text>
+<text x="664" y="438.0" font-family="Geist Mono" font-size="14" fill="#a3a3a3">0</text>
+<text x="664" y="459.0" font-family="Geist Mono" font-size="14" fill="#a3a3a3">1</text>
+<text x="664" y="480.0" font-family="Geist Mono" font-size="14" fill="#a3a3a3">1</text>
+<text x="664" y="501.0" font-family="Geist Mono" font-size="14" fill="#a3a3a3">2</text>
+<text x="664" y="522.0" font-family="Geist Mono" font-size="14" fill="#a3a3a3">3</text>
+</svg>

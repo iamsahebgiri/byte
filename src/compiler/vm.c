@@ -7,7 +7,6 @@
 #include <time.h>
 
 #include "chunk.h"
-#include "common.h"
 #include "compiler.h"
 #include "memory.h"
 #include "object.h"

@@ -1,0 +1,30 @@
+{
+  "name": "byte-playground",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "dev:stop": "astro dev stop",
+    "build": "astro build",
+    "preview": "astro preview",
+    "build:wasm": "bash build.sh",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.4.1"
+  },
+  "devDependencies": {
+    "vite-plus": "1.0.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.0.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "11.20.0",
+      "onFail": "download"
+    }
+  }
+}

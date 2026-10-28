@@ -35,3 +35,9 @@
 build/
 build-meson/
 .cache
+
+# Web playground build output (see web/build.sh and web/package.json)
+web/dist/
+web/.astro/
+web/node_modules/
+web/public/wasm/
